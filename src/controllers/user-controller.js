@@ -7,7 +7,6 @@
 
 import { User } from '../models/user.js'
 import jwt from 'jsonwebtoken'
-// import { MovieResponse } from '../models/movie-response.js'
 
 /**
  * Encapsulates a controller.
@@ -79,8 +78,6 @@ export class UserController {
    * @param {Function} next - Express next middleware function.
    */
   async createPost (req, res, next) {
-    console.log('Creating user account.')
-    console.log(req.body)
     try {
       const user = new User({
         username: req.body.username,
