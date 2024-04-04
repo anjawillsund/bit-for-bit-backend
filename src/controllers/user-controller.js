@@ -7,7 +7,7 @@
 
 import { User } from '../models/user.js'
 import jwt from 'jsonwebtoken'
-import { MovieResponse } from '../models/movie-response.js'
+// import { MovieResponse } from '../models/movie-response.js'
 
 /**
  * Encapsulates a controller.
@@ -184,39 +184,16 @@ export class UserController {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
 
     // TODO: Se över denna metod och ta bort användaren från vänners vänlistor vid borttagning.
-    // If decodedToken.userId === user1Id, use this update.
-    const update1 = {
-      $set: {
-        user1Id: '-',
-        user1Answered: false,
-        user1AnsweredYes: false
-      }
-    }
-
-    // If decodedToken.userId === user2Id, use this update.
-    const update2 = {
-      $set: {
-        user2Id: '-',
-        user2Answered: false,
-        user2AnsweredYes: false
-      }
-    }
 
     try {
-      const update1MovieResponses = await MovieResponse.updateMany({ user1Id: decodedToken.userId }, update1)
-      const update2MovieResponses = await MovieResponse.updateMany({ user2Id: decodedToken.userId }, update2)
-
-      // If the updates were successful.
-      if (update1MovieResponses.acknowledged === true && update2MovieResponses.acknowledged === true) {
-        // Delete the user from the database.
-        const user = await User.deleteOne({ _id: decodedToken.userId })
-        // If the user was deleted successfully.
-        if (user.deletedCount === 1) {
-          console.log('Account was deleted successfully.')
-          req.message = 'Account was deleted successfully.'
-        } else {
-          throw new Error('An unknown error occured. Please try again.')
-        }
+      // Delete the user from the database.
+      const user = await User.deleteOne({ _id: decodedToken.id })
+      // If the user was deleted successfully.
+      if (user.deletedCount === 1) {
+        console.log('Account was deleted successfully.')
+        req.message = 'Account was deleted successfully.'
+      } else {
+        throw new Error('An unknown error occured. Please try again.')
       }
       // Go to logout function.
       next()
