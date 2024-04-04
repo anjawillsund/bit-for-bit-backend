@@ -27,4 +27,4 @@ npm install
 This project needs a frontend to be used, preferably the "Bit För Bit" frontend.
 
 ## Contribution
-The boiler plate code in this project is from the application "PixFlixr". 
+The boiler plate code in this project is from the application "PixFlixr" that was developed by Anja Willsund during the course 1DV613 Software Development Project.
