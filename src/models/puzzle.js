@@ -63,6 +63,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: false,
     trim: true
+  },
+  private: {
+    type: Boolean,
+    default: true
   }
   // image: {
   //   type: String,
