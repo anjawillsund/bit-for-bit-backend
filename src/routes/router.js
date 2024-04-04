@@ -6,11 +6,14 @@
  */
 
 import express from 'express'
+import { router as myRouter } from './my-router.js'
 import { router as userRouter } from './user-router.js'
 
 export const router = express.Router()
 
 router.use('/', userRouter)
+
+router.use('/my', myRouter)
 
 router.use('*', (req, res, next) => {
   const error = new Error('Not Found')
