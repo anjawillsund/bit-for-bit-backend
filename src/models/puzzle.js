@@ -64,7 +64,7 @@ const schema = new mongoose.Schema({
     required: false,
     trim: true
   },
-  private: {
+  isPrivate: {
     type: Boolean,
     default: true
   }
