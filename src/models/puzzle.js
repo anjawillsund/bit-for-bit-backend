@@ -9,6 +9,11 @@ import mongoose from 'mongoose'
 
 // Create a puzzle schema.
 const schema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
   piecesNumber: {
     type: Number,
     required: false,
