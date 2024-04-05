@@ -16,7 +16,17 @@ const schema = new mongoose.Schema({
     trim: true,
     unique: true,
     minlength: 1,
-    maxlength: [50, 'The username must not contain more than 50 characters.']
+    maxlength: [50, 'The username must not contain more than 50 characters.'],
+    validate: {
+      /**
+       * Checks if the username only contains letters and numbers.
+       *
+       * @param {string} value - The username to validate.
+       * @returns {boolean} True if the username only contains letters and numbers.
+       */
+      validator: (value) => /^[a-zA-Z0-9]+$/.test(value),
+      message: 'The username must only contain letters and numbers.'
+    }
   },
   password: {
     type: String,
