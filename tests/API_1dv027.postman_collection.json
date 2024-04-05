@@ -1,0 +1,1291 @@
+{
+	"info": {
+		"_postman_id": "1850d916-2469-44f9-b6d7-342fa3801b7c",
+		"name": "API 1dv027",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25109232"
+	},
+	"item": [
+		{
+			"name": "registerUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 201\r",
+							"pm.test(\"Status code is 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure of the data object\r",
+							"pm.test(\"Data object has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.have.all.keys('id', 'email', 'firstName', 'lastName', 'role', 'createdAt');\r",
+							"    pm.expect(jsonData.data.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/);\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and has exactly 1 item\r",
+							"pm.test(\"Links array exists and has 1 item\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the item in the links array\r",
+							"pm.test(\"Item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links[0]).to.have.all.keys('href', 'rel', 'method');\r",
+							"    pm.expect(jsonData.links[0].href).to.eql(\"/user/login\");\r",
+							"    pm.expect(jsonData.links[0].rel).to.eql(\"login\");\r",
+							"    pm.expect(jsonData.links[0].method).to.eql(\"POST\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"const response = pm.response.json(); // Parse the response\r",
+							"\r",
+							"// Extract email and id from the response\r",
+							"const userEmail = response.data.email;\r",
+							"const currentUserId = response.data.id;\r",
+							"\r",
+							"if (userEmail && currentUserId) {\r",
+							"    // Save email and id as collection variables\r",
+							"    pm.collectionVariables.set(\"userEmail\", userEmail);\r",
+							"    pm.collectionVariables.set(\"currentUserId\", currentUserId);\r",
+							"\r",
+							"    console.log(\"userEmail and currentUserId saved:\", userEmail, currentUserId);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate a unique identifier, e.g., current timestamp\r",
+							"let uniqueId = Date.now();\r",
+							"\r",
+							"// Construct a unique email using the unique identifier\r",
+							"let uniqueEmail = `ma${uniqueId}@farmer.se`;\r",
+							"\r",
+							"// Save the unique email to a variable\r",
+							"pm.variables.set(\"uniqueEmail\", uniqueEmail);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{uniqueEmail}}\",\r\n    \"password\": \"password123\",\r\n    \"firstName\": \"ma\",\r\n    \"lastName\": \"fre\",\r\n    \"role\": \"farmer\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user/register",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "loginUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 201\r",
+							"pm.test(\"Status code is 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the data object\r",
+							"pm.test(\"Data object contains accessToken\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.have.all.keys('accessToken');\r",
+							"    pm.expect(jsonData.data.accessToken).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and has exactly 1 item\r",
+							"pm.test(\"Links array exists and has 1 item\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the item in the links array\r",
+							"pm.test(\"Item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const link = jsonData.links[0];\r",
+							"    pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"    pm.expect(link.href).to.eql(\"/user/register\");\r",
+							"    pm.expect(link.rel).to.eql(\"register\");\r",
+							"    pm.expect(link.method).to.eql(\"POST\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"const accessToken = response.data.accessToken;\r",
+							"\r",
+							"if (accessToken) {\r",
+							"    console.log(\"Access token: \", accessToken);\r",
+							"\r",
+							"    pm.collectionVariables.set(\"JWTtoken\", accessToken);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{userEmail}}\",\r\n    \"password\": \"password123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user/login",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllHives",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 200\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Check that data array exists and has at least one item\r",
+							"pm.test(\"Data array exists and is not empty\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure of the first item in the data array\r",
+							"pm.test(\"First item in data array has expected structure\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data[0]).to.have.all.keys('hiveId', 'name', 'location', 'registeredById');\r",
+							"});\r",
+							"\r",
+							"// Check that links array exists and has at least one item\r",
+							"pm.test(\"Links array exists and is not empty\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure of the first item in the links array\r",
+							"pm.test(\"First item in links array has expected structure\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links[0]).to.have.all.keys('href', 'rel', 'method');\r",
+							"    pm.expect(jsonData.links[0].href).to.eql(\"/hives\");\r",
+							"    pm.expect(jsonData.links[0].rel).to.eql(\"add-hive\");\r",
+							"    pm.expect(jsonData.links[0].method).to.eql(\"POST\");\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"// Ensure there's a 'data' property and it's an array\r",
+							"if (Array.isArray(response.data)) {\r",
+							"    // Extract all hiveIds into an array\r",
+							"    const hiveIds = response.data.map(hive => hive.hiveId);\r",
+							"\r",
+							"    // Find the maximum hiveId\r",
+							"    const maxHiveId = Math.max(...hiveIds);\r",
+							"\r",
+							"    // Calculate the next hiveId\r",
+							"    const nextHiveId = maxHiveId + 1;\r",
+							"\r",
+							"    // Save the next hiveId as a collection variable\r",
+							"    pm.collectionVariables.set(\"nextHiveId\", nextHiveId);\r",
+							"\r",
+							"    console.log(\"Next hiveId:\", nextHiveId);\r",
+							"} else {\r",
+							"    console.log(\"Response data is not an array or is missing\");\r",
+							"}\r",
+							"\r",
+							"const hiveIdNot0Nor1 = response.data.filter((hive) => hive.hiveId !== (0 || 1))[0].hiveId;\r",
+							"\r",
+							"if (hiveIdNot0Nor1) {\r",
+							"    console.log(\"Deletable hiveId\", hiveIdNot0Nor1);\r",
+							"\r",
+							"    pm.collectionVariables.set(\"deletableHiveId\", hiveIdNot0Nor1);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}/hives",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"hives"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getHiveStatus",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 200\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure of the data object\r",
+							"pm.test(\"Data object has expected structure\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.have.all.keys('hiveId', 'location', 'flow', 'humidity', 'temperature', 'weight');\r",
+							"    pm.expect(jsonData.data.flow).to.be.a('number');\r",
+							"    pm.expect(jsonData.data.humidity).to.be.a('number');\r",
+							"    pm.expect(jsonData.data.temperature).to.be.a('number');\r",
+							"    pm.expect(jsonData.data.weight).to.be.a('number');\r",
+							"});\r",
+							"\r",
+							"// Check that links array exists and has the expected length\r",
+							"pm.test(\"Links array exists and has 5 items\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(5);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/hives/0",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"hives",
+						"0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getRecentTemperature",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 200\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the data object\r",
+							"pm.test(\"Data object has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.have.all.keys('hiveId', 'date', 'temperature');\r",
+							"    pm.expect(jsonData.data.date).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.temperature).to.be.a('number');\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 5 items\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(5);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of each item in the links array\r",
+							"pm.test(\"Each item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    jsonData.links.forEach((link) => {\r",
+							"        pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"        pm.expect(link.href).to.be.a('string');\r",
+							"        pm.expect(link.rel).to.be.a('string');\r",
+							"        pm.expect(link.method).to.be.oneOf(['GET', 'POST', 'PUT', 'DELETE']);\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/hives/0/temperature",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"hives",
+						"0",
+						"temperature"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTemperature",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 200\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and type of entries in the data array\r",
+							"pm.test(\"Data array entries have expected structure and types\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.be.an('array').that.is.not.empty;\r",
+							"    jsonData.data.forEach((entry) => {\r",
+							"        pm.expect(entry).to.have.all.keys('hiveId', 'date', 'temperature');\r",
+							"        pm.expect(entry.hiveId).to.be.a('number');\r",
+							"        pm.expect(entry.date).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"        pm.expect(entry.temperature).to.be.a('number');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 5 items\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(5);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure of each item in the links array\r",
+							"pm.test(\"Each item in links array has expected structure\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    jsonData.links.forEach((link) => {\r",
+							"        pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"        pm.expect(link.href).to.be.a('string');\r",
+							"        pm.expect(link.rel).to.be.a('string');\r",
+							"        pm.expect(link.method).to.be.oneOf(['GET', 'POST', 'PUT', 'DELETE']);\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/hives/0/temperature?startDate=2017-04-20&endDate=2017-04-21",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"hives",
+						"0",
+						"temperature"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2017-04-20"
+						},
+						{
+							"key": "endDate",
+							"value": "2017-04-21"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addHive",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Retrieve the nextHiveId from the collection variables\r",
+							"let nextHiveId = pm.collectionVariables.get(\"nextHiveId\");\r",
+							"\r",
+							"// Create the new name and location by appending nextHiveId\r",
+							"let newName = \"Name \" + nextHiveId; \r",
+							"let newLocation = \"Location \" + nextHiveId; \r",
+							"\r",
+							"// Set these as variables accessible in the request body\r",
+							"pm.variables.set(\"newName\", newName);\r",
+							"pm.variables.set(\"newLocation\", newLocation);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 201\r",
+							"pm.test(\"Status code is 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the data object\r",
+							"pm.test(\"Data object has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.have.all.keys('hiveId', 'name', 'location', 'registeredById', 'createdAt', 'updatedAt', 'id');\r",
+							"    pm.expect(jsonData.data.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.id).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 4 items\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(4);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of each item in the links array\r",
+							"pm.test(\"Each item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    jsonData.links.forEach((link) => {\r",
+							"        pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"        pm.expect(link.href).to.be.a('string');\r",
+							"        pm.expect(link.rel).to.be.a('string');\r",
+							"        pm.expect(link.method).to.be.oneOf(['GET', 'POST', 'PUT', 'DELETE']);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"const response = pm.response.json(); // Parse the response\r",
+							"\r",
+							"// Extract hiveId from the response\r",
+							"const addedHiveId = response.data.hiveId;\r",
+							"\r",
+							"// Update the nextHiveId\r",
+							"const nextHiveId = addedHiveId + 1\r",
+							"\r",
+							"// Save addedHiveId as collection variables\r",
+							"pm.collectionVariables.set(\"addedHiveId\", addedHiveId);\r",
+							"console.log(\"addedHiveId:\", addedHiveId);\r",
+							"\r",
+							"pm.collectionVariables.set(\"nextHiveId\", nextHiveId);\r",
+							"console.log(\"Updated nextHiveId:\", nextHiveId);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"hiveId\": \"{{nextHiveId}}\",\r\n    \"name\": \"{{newName}}\",\r\n    \"location\": \"{{newLocation}}\",\r\n    \"registeredById\": \"{{currentUserId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/hives",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"hives"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateHive",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Retrieve the addedHiveId from the collection variables\r",
+							"let addedHiveId = pm.collectionVariables.get(\"addedHiveId\");\r",
+							"\r",
+							"// Create the new name and location by appending addedHiveId\r",
+							"let updatedName = \"Updated name \" + addedHiveId; \r",
+							"let updatedLocation = \"Updated location \" + addedHiveId; \r",
+							"\r",
+							"// Set these as variables accessible in the request body\r",
+							"pm.variables.set(\"updatedName\", updatedName);\r",
+							"pm.variables.set(\"updatedLocation\", updatedLocation);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 200\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the success message\r",
+							"pm.test(\"Success message is correct\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Hive updated successfully.\");\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 4 items\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(4);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of each item in the links array\r",
+							"pm.test(\"Each item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    jsonData.links.forEach((link) => {\r",
+							"        pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"        pm.expect(link.href).to.be.a('string');\r",
+							"        pm.expect(link.rel).to.be.a('string');\r",
+							"        // Verify that the method is one of the expected HTTP methods\r",
+							"        pm.expect(link.method).to.be.oneOf(['GET', 'POST', 'PUT', 'DELETE']);\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{updatedName}}\",\r\n    \"location\": \"{{updatedLocation}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/hives/{{addedHiveId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"hives",
+						"{{addedHiveId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllHarvests",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 200\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the data array\r",
+							"pm.test(\"Data array has the correct structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.be.an('array').that.is.not.empty;\r",
+							"    jsonData.data.forEach((item) => {\r",
+							"        pm.expect(item).to.have.all.keys('hiveId', 'date', 'amount', 'userId');\r",
+							"        pm.expect(item.hiveId).to.be.a('number');\r",
+							"        pm.expect(item.date).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"        pm.expect(item.amount).to.be.a('number');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 1 item\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the item in the links array\r",
+							"pm.test(\"Item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const link = jsonData.links[0];\r",
+							"    pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"    pm.expect(link.href).to.eql(\"/harvest\");\r",
+							"    pm.expect(link.rel).to.eql(\"add-harvest\");\r",
+							"    pm.expect(link.method).to.eql(\"POST\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/harvest",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"harvest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addHarvest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 201\r",
+							"pm.test(\"Status code is 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the data object\r",
+							"pm.test(\"Data object has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.have.all.keys('hiveId', 'date', 'amount', 'userId', 'createdAt', 'updatedAt', 'id');\r",
+							"    pm.expect(jsonData.data.date).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.amount).to.be.a('number').and.to.eql(42);\r",
+							"    pm.expect(jsonData.data.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.id).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 1 item\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the item in the links array\r",
+							"pm.test(\"Item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const link = jsonData.links[0];\r",
+							"    pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"    pm.expect(link.href).to.eql(\"/harvest\");\r",
+							"    pm.expect(link.rel).to.eql(\"get-all-harvests\");\r",
+							"    pm.expect(link.method).to.eql(\"GET\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"hiveId\": \"{{addedHiveId}}\",\r\n    \"date\": \"2024-03-10\",\r\n    \"amount\": 42,\r\n    \"userId\": \"{{currentUserId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/harvest",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"harvest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteHive",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 200\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the message content\r",
+							"pm.test(\"Message is as expected\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Hive deleted successfully.\");\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 2 items\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(2);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of each item in the links array\r",
+							"pm.test(\"Each item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    jsonData.links.forEach((link) => {\r",
+							"        pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"        pm.expect(link.href).to.be.a('string');\r",
+							"        pm.expect(link.rel).to.be.a('string');\r",
+							"        pm.expect(link.method).to.be.oneOf(['GET', 'POST', 'PUT', 'DELETE']);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"const response = pm.response.json(); // Parse the response\r",
+							"\r",
+							"// Update the nextHiveId\r",
+							"const nextHiveId = pm.collectionVariables.get(\"addedHiveId\");\r",
+							"pm.collectionVariables.set(\"nextHiveId\", nextHiveId);\r",
+							"console.log(\"Updated nextHiveId: \", nextHiveId);\r",
+							"\r",
+							"// Delete the \"addedHiveId\"\r",
+							"pm.collectionVariables.unset(\"addedHiveId\");\r",
+							"const addedHiveId = pm.collectionVariables.get(\"addedHiveId\");\r",
+							"console.log(\"addedHiveId gone: \", addedHiveId);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/hives/{{addedHiveId}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"hives",
+						"{{addedHiveId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getMobileBeehiveRequest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 200\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of entries in the data array\r",
+							"pm.test(\"Data array entries have expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.be.an('array').that.is.not.empty;\r",
+							"    jsonData.data.forEach((entry) => {\r",
+							"        pm.expect(entry).to.have.all.keys('location', 'startDate', 'endDate', 'requestedById');\r",
+							"        pm.expect(entry.location).to.be.a('string');\r",
+							"        pm.expect(entry.startDate).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"        pm.expect(entry.endDate).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 1 item\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the item in the links array\r",
+							"pm.test(\"Item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const link = jsonData.links[0];\r",
+							"    pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"    pm.expect(link.href).to.eql(\"/mobile-beehive-request\");\r",
+							"    pm.expect(link.rel).to.eql(\"add-mobile-beehive-request\");\r",
+							"    pm.expect(link.method).to.eql(\"POST\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/mobile-beehive-request",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"mobile-beehive-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addMobileBeehiveRequest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 201\r",
+							"pm.test(\"Status code is 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the data object\r",
+							"pm.test(\"Data object has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data).to.have.all.keys(\r",
+							"        'location', \r",
+							"        'startDate', \r",
+							"        'endDate', \r",
+							"        'requestedById', \r",
+							"        'createdAt', \r",
+							"        'updatedAt', \r",
+							"        'id'\r",
+							"    );\r",
+							"    pm.expect(jsonData.data.startDate).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.endDate).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/); // Validates ISO 8601 format\r",
+							"    pm.expect(jsonData.data.id).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"// Check that the links array exists and contains the expected number of items\r",
+							"pm.test(\"Links array exists and contains 1 item\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.links).to.be.an('array').that.has.lengthOf(1);\r",
+							"});\r",
+							"\r",
+							"// Validate the structure and content of the item in the links array\r",
+							"pm.test(\"Item in links array has expected structure and content\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const link = jsonData.links[0];\r",
+							"    pm.expect(link).to.have.all.keys('href', 'rel', 'method');\r",
+							"    pm.expect(link.href).to.eql(\"/mobile-beehive-request\");\r",
+							"    pm.expect(link.rel).to.eql(\"get-all-mobile-beehive-requests\");\r",
+							"    pm.expect(link.method).to.eql(\"GET\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"location\": \"Here\",\r\n    \"startDate\": \"2024-03-28\",\r\n    \"endDate\": \"2024-03-29\",\r\n    \"requestedById\": \"{{currentUserId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/mobile-beehive-request",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"mobile-beehive-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "registerWebhook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check that the status code is 201\r",
+							"pm.test(\"Status code is 201\", () => {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Check that the response is in JSON format\r",
+							"pm.test(\"Response is in JSON format\", () => {\r",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"// Validate the message content\r",
+							"pm.test(\"Message is as expected\", () => {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql(\"Webhook registered successfully\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWTtoken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"url\": \"https://webhook.site/82ad2bb5-d560-41ca-8459-1f35bcbfa93e\",\r\n    \"events\": [\"addedHiveRequest\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/webhook/register",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"webhook",
+						"register"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "https://cscloud8-68.lnu.se/api-assignment/api/v1"
+		},
+		{
+			"key": "JWTtoken",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hQGZyZS5zZSIsImdpdmVuX25hbWUiOiJtYSIsImZhbWlseV9uYW1lIjoiZnJlIiwieF9yb2xlIjoiSW9UTGFiQWRtaW4iLCJpYXQiOjE3MTE1MzU0MzIsImV4cCI6MTcxMTUzNzIzMn0.PJs9jshyofPvB3vTZrzJVVLW0IYUNR0MwQ4gYOsFXQE"
+		},
+		{
+			"key": "deletableHiveId",
+			"value": ""
+		},
+		{
+			"key": "nextHiveId",
+			"value": ""
+		},
+		{
+			"key": "userEmail",
+			"value": ""
+		},
+		{
+			"key": "currentUserId",
+			"value": ""
+		}
+	]
+}
