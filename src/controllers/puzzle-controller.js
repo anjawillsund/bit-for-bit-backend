@@ -5,6 +5,7 @@
  * @version 1.0.0
  */
 
+import createError from 'http-errors'
 import sharp from 'sharp'
 import { Puzzle } from '../models/puzzle.js'
 
@@ -23,8 +24,10 @@ export class PuzzleController {
     try {
       let imageBinary = null
       if (req.file) {
+        console.log(req.file.size)
+        console.log(req.file.buffer.length)
         const pngBuffer = await sharp(req.file.buffer)
-          .resize({ width: 2000 })
+          .resize({ width: 1600 })
           .png()
           .toBuffer()
         imageBinary = pngBuffer
@@ -50,8 +53,67 @@ export class PuzzleController {
       }
       res.status(201).json({ message: 'Puzzle added successfully.' })
     } catch (error) {
+      // TODO: Titta på denna felhantering
+      if (error.message === 'offset is out of bounds') {
+        error.message = 'Image is too large. Maximum size is 10 MB.'
+      }
       console.log('Error: ' + error.message)
       error.status = 400
+      next(error)
+    }
+  }
+
+  /**
+   * Gets a specific puzzle.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   * @param {string} id - The id of the puzzle to load.
+   */
+  async loadPuzzle (req, res, next, id) {
+    try {
+      // This error is added to handle the case when the id is not a valid ObjectId, which must be a string consisting of exactly 24 hexadecimal characters.
+      if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        next(createError(400, 'Invalid id'))
+        return
+      }
+      const puzzle = await Puzzle.findOne({ _id: id })
+      if (!puzzle) {
+        next(createError(404, 'Puzzle not found'))
+        return
+      }
+      req.puzzle = puzzle
+
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Gets a specific puzzle by id.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async getPuzzle (req, res, next) {
+    try {
+      const puzzle = await Puzzle.findById(req.params.id)
+      const imageBase64 = puzzle.image.toString('base64')
+      // const imageBinary = puzzle.image
+      // if (!imageBinary) {
+      //   return res.status(404).send('Image not found.');
+      // }
+      const responseData = {
+        ...puzzle.toJSON(), // Assuming puzzle is a Mongoose document; adjust as necessary
+        imageUrl: `data:image/png;base64,${imageBase64}` // Prepend the data URI scheme
+      }
+      // res.type('png').send(puzzle)
+      // res.status(200).type('png').json({ puzzle })
+      res.json(responseData.imageUrl)
+    } catch (error) {
       next(error)
     }
   }
