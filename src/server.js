@@ -24,14 +24,14 @@ try {
   app.use(logger('dev'))
 
   // TODO: Ska detta finnas kvar?
-  app.use(express.urlencoded({ extended: false }))
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
   app.use(express.static(join(directoryFullName, '..', 'public')))
 
   app.use(helmet())
 
   // TODO: Ska detta finnas kvar med React? Fanns inte med i PixFlixr
-  app.use(express.json())
+  app.use(express.json({ limit: '10mb' }))
 
   // Add headers to allow cross origin requests.
   app.use((req, res, next) => {
@@ -70,32 +70,32 @@ try {
   app.use(function (err, req, res, next) {
     // 400 Bad Request.
     if (err.status === 400) {
-      return res.status(400).send(err.message)
+      return res.status(400).json({ message: err.message })
     }
 
     // 401 Unauthorized.
     if (err.status === 401) {
-      return res.status(401).send(err.message)
+      return res.status(401).json({ message: err.message })
     }
 
     // 403 Forbidden.
     if (err.status === 403) {
-      return res.status(403).send(err)
+      return res.status(403).json({ message: err.message })
     }
 
     // 404 Not Found.
     if (err.status === 404) {
-      return res.status(404).send(err)
+      return res.status(404).json({ message: err.message })
     }
 
     // 405 Method Not Allowed.
     if (err.status === 405) {
-      return res.status(405).send(err)
+      return res.status(405).json({ message: err.message })
     }
 
     // 500 Internal Server Error (in production, all other errors send this response).
     if (req.app.get('env') !== 'development') {
-      return res.status(500).send(err)
+      return res.status(500).json({ message: err.message })
     }
 
     // Development only!
