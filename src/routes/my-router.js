@@ -8,6 +8,7 @@
 import express from 'express'
 import multer from 'multer'
 import { authenticateToken } from '../utils/authentication.js'
+import { authorizeUser } from '../utils/authorization.js'
 import { PuzzleController } from '../controllers/puzzle-controller.js'
 
 export const router = express.Router()
@@ -31,8 +32,8 @@ router.route('/puzzles/:id')
   // .put(authenticateToken,
   //   upload.single('image'),
   //   (req, res, next) => puzzleController.updatePuzzle(req, res, next))
-  // .delete(authenticateToken,
-  //   (req, res, next) => puzzleController.deletePuzzle(req, res, next))
+  .delete(authenticateToken, authorizeUser,
+    (req, res, next) => puzzleController.deletePuzzle(req, res, next))
 // router.post('/create', controller.createPost)
 // router.get('/get-groups', controller.authenticateToken, controller.getUserGroups)
 // router.post('/add-group', controller.authenticateToken, controller.addGroup)
