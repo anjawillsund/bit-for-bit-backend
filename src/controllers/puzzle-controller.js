@@ -45,13 +45,14 @@ export class PuzzleController {
         privateNote: req.body.privateNote,
         sharedNote: req.body.sharedNote,
         isPrivate: req.body.isPrivate,
-        image: imageBinary
+        image: imageBinary,
+        owner: req.user.id
       })
       const response = await puzzle.save()
       if (!response.ok) {
         console.log(response)
       }
-      res.status(201).json({ message: 'Puzzle added successfully.' })
+      res.status(201).json({ id: response.id, message: 'Puzzle added successfully.' })
     } catch (error) {
       // TODO: Titta på denna felhantering
       if (error.message === 'offset is out of bounds') {
@@ -113,6 +114,29 @@ export class PuzzleController {
       // res.type('png').send(puzzle)
       // res.status(200).type('png').json({ puzzle })
       res.json(responseData.imageUrl)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Deletes a specific puzzle by id.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async deletePuzzle (req, res, next) {
+    try {
+      console.log(req)
+      const puzzle = await Puzzle.deleteOne({ _id: req.puzzle.id.toString() })
+      if (puzzle.deletedCount === 1) {
+        console.log('Puzzle was deleted successfully.')
+        req.message = 'Puzzle was deleted successfully.'
+      } else {
+        throw new Error('An unknown error occured. Please try again.')
+      }
+      res.status(204).send()
     } catch (error) {
       next(error)
     }
