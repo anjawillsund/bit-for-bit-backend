@@ -86,7 +86,7 @@ export class UserController {
 
       if (await user.save()) {
         console.log('User account created successfully.')
-        res.status(201).send('Your account was created successfully. Please log in.')
+        res.status(201).json({ message: 'Your account was created successfully. Please log in.' })
       } else {
         throw new Error('An unknown error occured. Please try again.')
       }
@@ -175,9 +175,9 @@ export class UserController {
     // Destroys the session when logging out.
     req.session.destroy(() => {
       if (req.message) {
-        res.status(200).send(req.message + ' You are now logged out.')
+        res.status(200).json({ message: req.message + ' You are now logged out.' })
       } else {
-        res.status(200).send('You are now logged out.')
+        res.status(200).json({ message: 'You are now logged out.' })
         console.log('User logged out successfully.')
       }
     })
