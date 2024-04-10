@@ -5,6 +5,7 @@
  * @version 1.0.0
  */
 
+import sharp from 'sharp'
 import { Puzzle } from '../models/puzzle.js'
 
 /**
@@ -20,6 +21,15 @@ export class PuzzleController {
    */
   async addPuzzle (req, res, next) {
     try {
+      let imageBinary = null
+      if (req.file) {
+        const pngBuffer = await sharp(req.file.buffer)
+          .resize({ width: 2000 })
+          .png()
+          .toBuffer()
+        imageBinary = pngBuffer
+        console.log(pngBuffer.length)
+      }
       const puzzle = new Puzzle({
         title: req.body.title,
         piecesNumber: req.body.piecesNumber,
@@ -31,7 +41,8 @@ export class PuzzleController {
         missingPiecesNumber: req.body.missingPiecesNumber,
         privateNote: req.body.privateNote,
         sharedNote: req.body.sharedNote,
-        isPrivate: req.body.isPrivate
+        isPrivate: req.body.isPrivate,
+        image: imageBinary
       })
       const response = await puzzle.save()
       if (!response.ok) {
