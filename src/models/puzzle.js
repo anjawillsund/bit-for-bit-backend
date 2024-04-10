@@ -84,6 +84,11 @@ const schema = new mongoose.Schema({
   },
   image: {
     type: Buffer
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 }, {
   timestamps: true,
