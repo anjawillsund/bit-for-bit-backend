@@ -72,12 +72,19 @@ const schema = new mongoose.Schema({
   isPrivate: {
     type: Boolean,
     default: true
+  },
+  isLentOut: {
+    type: Boolean,
+    default: false
+  },
+  lentOutTo: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  image: {
+    type: Buffer
   }
-  // image: {
-  //   type: String,
-  //   required: true,
-  //   trim: true
-  // }
 }, {
   timestamps: true,
   toObject: {
