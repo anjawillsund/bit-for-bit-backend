@@ -95,7 +95,19 @@ const schema = new mongoose.Schema({
     type: String,
     required: false,
     trim: true,
-    maxLength: [100, 'The manufacturer must not contain more than 100 characters']
+    maxLength: [100, 'The manufacturer must not contain more than 100 characters'],
+    validate: {
+      /**
+       * Validates that the submitted title is a string.
+       *
+       * @param {string} value - The submitted title.
+       * @returns {boolean} True if the submitted title is valid, otherwise false.
+       */
+      validator: function (value) {
+        // The title must only contain letters, numbers, and spaces.
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà ]+$/.test(value)
+      }
+    }
   },
   // TODO: Lägga in mer validering här?
   lastPlayed: {
