@@ -29,13 +29,8 @@ router.route('/puzzles')
 router.route('/puzzles/:id')
   .get(authenticateToken,
     (req, res, next) => puzzleController.getPuzzle(req, res, next))
-  // .put(authenticateToken,
-  //   upload.single('image'),
-  //   (req, res, next) => puzzleController.updatePuzzle(req, res, next))
+  .put(authenticateToken, authorizeUser,
+    upload.single('image'),
+    (req, res, next) => puzzleController.updatePuzzle(req, res, next))
   .delete(authenticateToken, authorizeUser,
     (req, res, next) => puzzleController.deletePuzzle(req, res, next))
-// router.post('/create', controller.createPost)
-// router.get('/get-groups', controller.authenticateToken, controller.getUserGroups)
-// router.post('/add-group', controller.authenticateToken, controller.addGroup)
-// router.get('/logout', controller.authenticateToken, controller.logout)
-// router.get('/delete-user', controller.authenticateToken, controller.deleteUser, controller.logout)
