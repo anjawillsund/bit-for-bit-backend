@@ -22,17 +22,7 @@ export class PuzzleController {
    */
   async addPuzzle (req, res, next) {
     try {
-      let imageBinary = null
-      if (req.file) {
-        console.log(req.file.size)
-        console.log(req.file.buffer.length)
-        const pngBuffer = await sharp(req.file.buffer)
-          .resize({ width: 1600 })
-          .png()
-          .toBuffer()
-        imageBinary = pngBuffer
-        console.log(pngBuffer.length)
-      }
+      const imageBinary = await this.#convertImageToPng(req)
       const puzzle = new Puzzle({
         title: req.body.title,
         piecesNumber: req.body.piecesNumber,
@@ -92,6 +82,7 @@ export class PuzzleController {
     }
   }
 
+  // TODO: Hur hantera pussel som saknar bild?
   /**
    * Gets a specific puzzle by id.
    *
@@ -101,19 +92,25 @@ export class PuzzleController {
    */
   async getPuzzle (req, res, next) {
     try {
-      const puzzle = await Puzzle.findById(req.params.id)
-      const imageBase64 = puzzle.image.toString('base64')
-      // const imageBinary = puzzle.image
-      // if (!imageBinary) {
-      //   return res.status(404).send('Image not found.');
-      // }
-      const responseData = {
-        ...puzzle.toJSON(), // Assuming puzzle is a Mongoose document; adjust as necessary
-        imageUrl: `data:image/png;base64,${imageBase64}` // Prepend the data URI scheme
+      const puzzle = req.puzzle
+      let responseData
+      if (puzzle.image !== null) {
+        const imageBase64 = puzzle.image.toString('base64')
+        const { _id, image, owner, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+        responseData = {
+          ...puzzleData,
+          imageUrl: `data:image/png;base64,${imageBase64}`
+        }
+      } else {
+        const { _id, image, owner, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+        responseData = {
+          ...puzzleData
+        }
       }
       // res.type('png').send(puzzle)
       // res.status(200).type('png').json({ puzzle })
-      res.json(responseData.imageUrl)
+      // console.log(responseData)
+      res.status(200).json(responseData)
     } catch (error) {
       next(error)
     }
@@ -129,7 +126,18 @@ export class PuzzleController {
    */
   async getAllPuzzles (req, res, next) {
     try {
-      const puzzles = await Puzzle.find({ owner: req.user.id })
+      const puzzles = await Puzzle.find({ owner: req.user.id }, '_id -owner -createdAt -updatedAt -__v')
+      if (!puzzles) {
+        next(createError(404, 'No puzzles found'))
+        return
+      }
+      puzzles.forEach(puzzle => {
+        if (puzzle.image === null) {
+          return
+        }
+        const imageBase64 = puzzle.image.toString('base64')
+        puzzle.imageUrl = `data:image/png;base64,${imageBase64}`
+      })
       res.status(200).json(puzzles)
     } catch (error) {
       next(error)
@@ -157,5 +165,23 @@ export class PuzzleController {
     } catch (error) {
       next(error)
     }
+  }
+
+  /**
+   * Converts an image to a PNG.
+   *
+   * @param {object} req - Express request object.
+   * @returns {Buffer} The image as a PNG.
+   */
+  async #convertImageToPng (req) {
+    let imageBinary = null
+    if (req.file) {
+      const pngBuffer = sharp(req.file.buffer)
+        .resize({ width: 1600 })
+        .png()
+        .toBuffer()
+      imageBinary = pngBuffer
+    }
+    return imageBinary
   }
 }
