@@ -31,7 +31,19 @@ const schema = new mongoose.Schema({
   piecesNumber: {
     type: Number,
     required: false,
-    trim: true
+    trim: true,
+    validate: {
+      /**
+       * Validates that the submitted number of pieces is a number between 2 and 20 000.
+       *
+       * @param {string} value - The submitted pieces number.
+       * @returns {boolean} True if the submitted pieces number is valid, otherwise false.
+       */
+      validator: function (value) {
+        // The pieces number must only contain numbers.
+        return /^\d+$/.test(value) && value >= 2 && value <= 20000
+      }
+    }
   },
   size: {
     type: String,
