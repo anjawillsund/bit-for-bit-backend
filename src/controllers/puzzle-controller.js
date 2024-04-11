@@ -145,6 +145,38 @@ export class PuzzleController {
   }
 
   /**
+   * Updates a specific puzzle by id.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async updatePuzzle (req, res, next) {
+    try {
+      const imageBinary = await this.#convertImageToPng(req)
+      const puzzle = req.puzzle
+      puzzle.title = req.body.title || puzzle.title
+      puzzle.piecesNumber = req.body.piecesNumber || puzzle.piecesNumber
+      puzzle.size = req.body.size || puzzle.size
+      puzzle.manufacturer = req.body.manufacturer || puzzle.manufacturer
+      puzzle.lastPlayed = req.body.lastPlayed || puzzle.lastPlayed
+      puzzle.location = req.body.location || puzzle.location
+      puzzle.complete = req.body.complete || puzzle.complete
+      puzzle.missingPiecesNumber = req.body.missingPiecesNumber || puzzle.missingPiecesNumber
+      puzzle.privateNote = req.body.privateNote || puzzle.privateNote
+      puzzle.sharedNote = req.body.sharedNote || puzzle.sharedNote
+      puzzle.isPrivate = req.body.isPrivate || puzzle.isPrivate
+      puzzle.isLentOut = req.body.isLentOut || puzzle.isLentOut
+      puzzle.lentOutTo = req.body.lentOutTo || puzzle.lentOutTo
+      puzzle.image = imageBinary || puzzle.image
+      puzzle.save()
+      res.status(200).json({ message: 'Puzzle updated successfully.' })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
    * Deletes a specific puzzle by id.
    *
    * @param {object} req - Express request object.
