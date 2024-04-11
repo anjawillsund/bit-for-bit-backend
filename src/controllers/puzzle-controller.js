@@ -119,6 +119,23 @@ export class PuzzleController {
     }
   }
 
+  // TODO: Kolla att denna fungerar i React, blir för stor response i Postman
+  /**
+   * Gets all puzzles for the authenticated user.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async getAllPuzzles (req, res, next) {
+    try {
+      const puzzles = await Puzzle.find({ owner: req.user.id })
+      res.status(200).json(puzzles)
+    } catch (error) {
+      next(error)
+    }
+  }
+
   /**
    * Deletes a specific puzzle by id.
    *
