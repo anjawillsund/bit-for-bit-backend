@@ -143,7 +143,15 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         return !(value === false && !this.missingPiecesNumber)
-      }
+      },
+      /**
+       * This message is shown when the validation fails,
+       * indicating that 'missingPiecesNumber' must be provided if 'complete' is false.
+       *
+       * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
+       * @returns {string} The custom error message for the validation failure.
+       */
+      message: props => 'If \'complete\' is false, \'missingPiecesNumber\' must also be provided.'
     }
   },
   missingPiecesNumber: {
@@ -158,7 +166,15 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         return (value >= 1 && value < this.piecesNumber)
-      }
+      },
+      /**
+       * This message is shown when the validation fails,
+       * indicating that 'missingPiecesNumber' must be provided if 'complete' is false.
+       *
+       * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
+       * @returns {string} The custom error message for the validation failure.
+       */
+      message: props => 'The number of missing pieces must not be 0 or greater than the total number of pieces.'
     }
   },
   privateNote: {
