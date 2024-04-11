@@ -5,6 +5,7 @@
  * @version 1.0.0
  */
 
+import crypto from 'crypto'
 import createError from 'http-errors'
 import sharp from 'sharp'
 import { Puzzle } from '../models/puzzle.js'
@@ -107,6 +108,14 @@ export class PuzzleController {
         responseData = {
           ...puzzleData
         }
+      }
+      if (puzzle.privateNote) {
+        const { iv, encryptedData } = JSON.parse(puzzle.privateNote)
+        const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
+        const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'))
+        let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
+        decrypted += decipher.final('utf8')
+        responseData.privateNote = decrypted
       }
       // res.type('png').send(puzzle)
       // res.status(200).type('png').json({ puzzle })
