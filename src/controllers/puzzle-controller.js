@@ -26,7 +26,8 @@ export class PuzzleController {
       const puzzle = new Puzzle({
         title: req.body.title,
         piecesNumber: req.body.piecesNumber,
-        size: req.body.size,
+        sizeHeight: req.body.sizeHeight,
+        sizeWidth: req.body.sizeWidth,
         manufacturer: req.body.manufacturer,
         lastPlayed: req.body.lastPlayed,
         location: req.body.location,
@@ -157,7 +158,8 @@ export class PuzzleController {
       const puzzle = req.puzzle
       puzzle.title = req.body.title || puzzle.title
       puzzle.piecesNumber = req.body.piecesNumber || puzzle.piecesNumber
-      puzzle.size = req.body.size || puzzle.size
+      puzzle.sizeHeight = req.body.sizeHeight || puzzle.sizeHeight
+      puzzle.sizeWidth = req.body.sizeWidth || puzzle.sizeWidth
       puzzle.manufacturer = req.body.manufacturer || puzzle.manufacturer
       puzzle.lastPlayed = req.body.lastPlayed || puzzle.lastPlayed
       puzzle.location = req.body.location || puzzle.location
