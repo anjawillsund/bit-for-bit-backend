@@ -79,7 +79,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // return /^\d{1,5}$/.test(value) && !(value && !this.sizeWidth)
-        return (value === undefined || (value >= 1 && value <= 99999)) && !(value && !this.sizeWidth)
+        return (value === undefined || (value >= 1 && value <= 99999)) && !(value && !this.sizeHeight)
       },
       /**
        * This message is shown when the validation fails,
