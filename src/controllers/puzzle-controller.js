@@ -36,6 +36,9 @@ export class PuzzleController {
         missingPiecesNumber: req.body.missingPiecesNumber,
         privateNote: req.body.privateNote,
         sharedNote: req.body.sharedNote,
+        isLentOut: req.body.isLentOut,
+        lentOutTo: req.body.lentOutTo,
+        lentOutToString: req.body.lentOutToString,
         isPrivate: req.body.isPrivate,
         image: imageBinary,
         owner: req.user.id
@@ -179,6 +182,7 @@ export class PuzzleController {
       puzzle.isPrivate = req.body.isPrivate || puzzle.isPrivate
       puzzle.isLentOut = req.body.isLentOut || puzzle.isLentOut
       puzzle.lentOutTo = req.body.lentOutTo || puzzle.lentOutTo
+      puzzle.lentOutToString = req.body.lentOutToString || puzzle.lentOutToString
       puzzle.image = imageBinary || puzzle.image
       puzzle.save()
       res.status(200).json({ message: 'Puzzle updated successfully.' })
