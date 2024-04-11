@@ -31,7 +31,6 @@ const schema = new mongoose.Schema({
   piecesNumber: {
     type: Number,
     required: false,
-    trim: true,
     validate: {
       /**
        * Validates that the submitted number of pieces is a number between 2 and 20 000.
@@ -45,22 +44,52 @@ const schema = new mongoose.Schema({
       }
     }
   },
-  size: {
-    type: String,
+  sizeHeight: {
+    type: Number,
     required: false,
-    trim: true
-    // validate: {
-    //   /**
-    //    * Validates that the submitted flow is a number.
-    //    *
-    //    * @param {string} value - The submitted flow.
-    //    * @returns {boolean} True if the submitted flow is valid, otherwise false.
-    //    */
-    //   validator: function (value) {
-    //     // The flow must only contain numbers.
-    //     return /^\d+$/.test(value)
-    //   }
-    // },
+    validate: {
+      /**
+       * Validates that the submitted size is a number between 1 and 99999.
+       *
+       * @param {string} value - The submitted size.
+       * @returns {boolean} True if the submitted size is valid, otherwise false.
+       */
+      validator: function (value) {
+        return (value === undefined || (value >= 1 && value <= 99999)) && !(value && !this.sizeWidth)
+      },
+      /**
+       * This message is shown when the validation fails,
+       * indicating that both `sizeHeight` and `sizeWidth` fields must be provided together.
+       *
+       * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
+       * @returns {string} The custom error message for the validation failure.
+       */
+      message: props => 'If \'sizeHeight\' is provided, \'sizeWidth\' must also be provided.'
+    }
+  },
+  sizeWidth: {
+    type: Number,
+    required: false,
+    validate: {
+      /**
+       * Validates that the submitted size is a number between 1 and 99999.
+       *
+       * @param {string} value - The submitted size.
+       * @returns {boolean} True if the submitted size is valid, otherwise false.
+       */
+      validator: function (value) {
+        // return /^\d{1,5}$/.test(value) && !(value && !this.sizeWidth)
+        return (value === undefined || (value >= 1 && value <= 99999)) && !(value && !this.sizeWidth)
+      },
+      /**
+       * This message is shown when the validation fails,
+       * indicating that both `sizeHeight` and `sizeWidth` fields must be provided together.
+       *
+       * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
+       * @returns {string} The custom error message for the validation failure.
+       */
+      message: props => 'If \'sizeWidth\' is provided, \'sizeHeight\' must also be provided.'
+    }
   },
   manufacturer: {
     type: String,
@@ -82,8 +111,7 @@ const schema = new mongoose.Schema({
   },
   missingPiecesNumber: {
     type: Number,
-    required: false,
-    trim: true
+    required: false
   },
   privateNote: {
     type: String,
