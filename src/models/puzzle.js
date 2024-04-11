@@ -23,7 +23,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:; ]+$/.test(value)
       }
     },
     minLength: 1,
@@ -56,7 +56,7 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the submitted size is valid, otherwise false.
        */
       validator: function (value) {
-        return ((value >= 1 && value <= 99999)) && !(value && !this.sizeWidth)
+        return ((value >= 1 && value <= 100000)) && !(value && !this.sizeWidth)
       },
       /**
        * This message is shown when the validation fails,
@@ -79,7 +79,7 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the submitted size is valid, otherwise false.
        */
       validator: function (value) {
-        return ((value >= 1 && value <= 99999)) && !(value && !this.sizeHeight)
+        return ((value >= 1 && value <= 100000)) && !(value && !this.sizeHeight)
       },
       /**
        * This message is shown when the validation fails,
@@ -105,7 +105,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:; ]+$/.test(value)
       }
     }
   },
@@ -128,7 +128,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:; ]+$/.test(value)
       }
     }
   },
@@ -254,7 +254,7 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the submitted name is valid, otherwise false.
        */
       validator: function (value) {
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:; ]+$/.test(value)
       },
       /**
        * This message is shown when the validation fails,
@@ -305,8 +305,9 @@ schema.pre('save', function () {
   }
   if (this.lentOutTo) {
     this.isLentOut = true
+    this.lentOutToString = null
   }
-  if (this.lentOutToString) {
+  if (this.lentOutToString && !this.lentOutTo) {
     this.lentOutTo = '6617db0e18569854b2352a68'
     this.isLentOut = true
   }
