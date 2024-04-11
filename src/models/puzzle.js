@@ -196,12 +196,75 @@ const schema = new mongoose.Schema({
   },
   isLentOut: {
     type: Boolean,
-    default: false
+    default: false,
+    validate: {
+      /**
+       * Validates that if the puzzle lent out, whom the puzzle is lent out to must also be submitted.
+       *
+       * @param {string} value - The submitted boolean.
+       * @returns {boolean} True if the submitted boolean is valid, otherwise false.
+       */
+      validator: function (value) {
+        return !(value === true && !this.lentOutTo)
+      },
+      /**
+       * This message is shown when the validation fails,
+       * indicating that 'lentOutTo' must be provided if 'isLentOut' is true.
+       *
+       * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
+       * @returns {string} The custom error message for the validation failure.
+       */
+      message: props => 'If \'isLentOut\' is true, \'lentOutTo\' must also be provided.'
+    }
   },
   lentOutTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+    validate: {
+      /**
+       * Validates that if the puzzle lent out, whom the puzzle is lent out to must also be submitted.
+       *
+       * @param {string} value - The submitted user id.
+       * @returns {boolean} True if the submitted user id is not '6617db0e18569854b2352a68' or if lentOutToString has been submitted, otherwise false.
+       */
+      validator: function (value) {
+        return !(value.toString() === '6617db0e18569854b2352a68' && !this.lentOutToString)
+      },
+      /**
+       * This message is shown when the validation fails,
+       * indicating that 'lentOutToString' must be provided if 'lentOutTo' is '6617db0e18569854b2352a68'.
+       *
+       * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
+       * @returns {string} The custom error message for the validation failure.
+       */
+      message: props => 'If \'lentOutTo\' is \'other\', \'lentOutToString\' must also be provided.'
+    }
+  },
+  lentOutToString: {
     type: String,
     required: false,
-    trim: true
+    trim: true,
+    maxLength: [50, 'The name of the person the puzzle is lent out to must not contain more than 50 characters'],
+    validate: {
+      /**
+       * Validates that the name of the person the puzzle is lent out to only contains letters, numbers, and spaces.
+       *
+       * @param {string} value - The submitted name.
+       * @returns {boolean} True if the submitted name is valid, otherwise false.
+       */
+      validator: function (value) {
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà ]+$/.test(value)
+      },
+      /**
+       * This message is shown when the validation fails,
+       * indicating that 'lentOutToString' is not valid.
+       *
+       * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
+       * @returns {string} The custom error message for the validation failure.
+       */
+      message: props => 'The name of the person lending the puzzle must only contain letters, numbers and spaces.'
+    }
   },
   image: {
     type: Buffer
@@ -238,6 +301,9 @@ schema.pre('save', function () {
   // Set the 'complete' field based on the 'missingPiecesNumber' field.
   if (this.missingPiecesNumber > 0) {
     this.complete = false
+  }
+  if (this.lentOutTo) {
+    this.isLentOut = true
   }
   if (this.privateNote) {
     this.privateNote = JSON.stringify(encryptPrivateNote(this.privateNote))
