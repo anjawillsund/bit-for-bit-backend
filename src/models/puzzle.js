@@ -22,7 +22,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖ ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà ]+$/.test(value)
       }
     },
     minLength: 1,
@@ -94,8 +94,10 @@ const schema = new mongoose.Schema({
   manufacturer: {
     type: String,
     required: false,
-    trim: true
+    trim: true,
+    maxLength: [100, 'The manufacturer must not contain more than 100 characters']
   },
+  // TODO: Lägga in mer validering här?
   lastPlayed: {
     type: Date,
     required: false
@@ -103,7 +105,20 @@ const schema = new mongoose.Schema({
   location: {
     type: String,
     required: false,
-    trim: true
+    trim: true,
+    maxLength: [100, 'The location must not contain more than 100 characters'],
+    validate: {
+      /**
+       * Validates that the submitted title is a string.
+       *
+       * @param {string} value - The submitted title.
+       * @returns {boolean} True if the submitted title is valid, otherwise false.
+       */
+      validator: function (value) {
+        // The title must only contain letters, numbers, and spaces.
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà ]+$/.test(value)
+      }
+    }
   },
   complete: {
     type: Boolean,
