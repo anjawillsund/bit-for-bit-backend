@@ -12,7 +12,21 @@ const schema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    validate: {
+      /**
+       * Validates that the submitted title is a string.
+       *
+       * @param {string} value - The submitted title.
+       * @returns {boolean} True if the submitted title is valid, otherwise false.
+       */
+      validator: function (value) {
+        // The title must only contain letters, numbers, and spaces.
+        return /^[a-zA-Z0-9åäöÅÄÖ ]+$/.test(value)
+      }
+    },
+    minLength: 1,
+    maxLength: [100, 'The title must not contain more than 100 characters']
   },
   piecesNumber: {
     type: Number,
