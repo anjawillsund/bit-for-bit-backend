@@ -20,7 +20,7 @@ const schema = new mongoose.Schema({
     trim: true
   },
   size: {
-    type: Number,
+    type: String,
     required: false,
     trim: true
     // validate: {
