@@ -5,6 +5,7 @@
  * @version 1.0.0
  */
 
+import crypto from 'crypto'
 import mongoose from 'mongoose'
 
 // Create a puzzle schema.
@@ -233,12 +234,30 @@ schema.virtual('id').get(function () {
   return this._id.toHexString()
 })
 
-// Pre-save hook to set the 'complete' field based on the 'missingPiecesNumber' field.
-schema.pre('save', async function () {
+schema.pre('save', function () {
+  // Set the 'complete' field based on the 'missingPiecesNumber' field.
   if (this.missingPiecesNumber > 0) {
     this.complete = false
   }
+  if (this.privateNote) {
+    this.privateNote = JSON.stringify(encryptPrivateNote(this.privateNote))
+  }
 })
+
+/**
+ * Encrypts a private note.
+ *
+ * @param {string} privateNote - The private note to encrypt.
+ * @returns {object} The encrypted private note.
+ */
+function encryptPrivateNote (privateNote) {
+  const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
+  const iv = Buffer.from(process.env.SECRET_ENCRYPTION_IV, 'base64')
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)
+  let encrypted = cipher.update(privateNote, 'utf8', 'hex')
+  encrypted += cipher.final('hex')
+  return { iv: iv.toString('hex'), encryptedData: encrypted }
+}
 
 // Create a model using the schema.
 export const Puzzle = mongoose.model('Puzzle', schema)
