@@ -164,12 +164,14 @@ const schema = new mongoose.Schema({
   privateNote: {
     type: String,
     required: false,
-    trim: true
+    trim: true,
+    maxLength: [1000, 'The private note must not contain more than 1 000 characters']
   },
   sharedNote: {
     type: String,
     required: false,
-    trim: true
+    trim: true,
+    maxLength: [1000, 'The shared note must not contain more than 1 000 characters']
   },
   isPrivate: {
     type: Boolean,
