@@ -55,7 +55,7 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the submitted size is valid, otherwise false.
        */
       validator: function (value) {
-        return (value === undefined || (value >= 1 && value <= 99999)) && !(value && !this.sizeWidth)
+        return ((value >= 1 && value <= 99999)) && !(value && !this.sizeWidth)
       },
       /**
        * This message is shown when the validation fails,
@@ -78,8 +78,7 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the submitted size is valid, otherwise false.
        */
       validator: function (value) {
-        // return /^\d{1,5}$/.test(value) && !(value && !this.sizeWidth)
-        return (value === undefined || (value >= 1 && value <= 99999)) && !(value && !this.sizeHeight)
+        return ((value >= 1 && value <= 99999)) && !(value && !this.sizeHeight)
       },
       /**
        * This message is shown when the validation fails,
@@ -134,11 +133,33 @@ const schema = new mongoose.Schema({
   },
   complete: {
     type: Boolean,
-    required: false
+    required: false,
+    validate: {
+      /**
+       * Validates that if the puzzle is not complete, the number of missing pieces must not be 0.
+       *
+       * @param {string} value - The submitted boolean.
+       * @returns {boolean} True if the submitted boolean is valid, otherwise false.
+       */
+      validator: function (value) {
+        return !(value === false && !this.missingPiecesNumber)
+      }
+    }
   },
   missingPiecesNumber: {
     type: Number,
-    required: false
+    required: false,
+    validate: {
+      /**
+       * Validates that if the number of missing pieces can not be greater than the total number of pieces.
+       *
+       * @param {string} value - The number of missing pieces.
+       * @returns {boolean} True if the number of missing pieces is more than 0 and less than the total number of pieces, otherwise false.
+       */
+      validator: function (value) {
+        return (value >= 1 && value < this.piecesNumber)
+      }
+    }
   },
   privateNote: {
     type: String,
@@ -192,6 +213,13 @@ const schema = new mongoose.Schema({
 // mongoose.
 schema.virtual('id').get(function () {
   return this._id.toHexString()
+})
+
+// Pre-save hook to set the 'complete' field based on the 'missingPiecesNumber' field.
+schema.pre('save', async function () {
+  if (this.missingPiecesNumber > 0) {
+    this.complete = false
+  }
 })
 
 // Create a model using the schema.
