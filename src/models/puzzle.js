@@ -205,7 +205,7 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the submitted boolean is valid, otherwise false.
        */
       validator: function (value) {
-        return !(value === true && !this.lentOutTo)
+        return !(value === true && !this.lentOutTo && !this.lentOutToString)
       },
       /**
        * This message is shown when the validation fails,
@@ -267,7 +267,8 @@ const schema = new mongoose.Schema({
     }
   },
   image: {
-    type: Buffer
+    type: Buffer,
+    default: null
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -303,6 +304,10 @@ schema.pre('save', function () {
     this.complete = false
   }
   if (this.lentOutTo) {
+    this.isLentOut = true
+  }
+  if (this.lentOutToString) {
+    this.lentOutTo = '6617db0e18569854b2352a68'
     this.isLentOut = true
   }
   if (this.privateNote) {
