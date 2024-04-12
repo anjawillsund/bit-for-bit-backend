@@ -23,11 +23,11 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:; ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:;! ]+$/.test(value)
       }
     },
     minLength: 1,
-    maxLength: [100, 'The title must not contain more than 100 characters']
+    maxLength: [100, 'The title must not contain more than 100 characters.']
   },
   piecesNumber: {
     type: Number,
@@ -65,7 +65,7 @@ const schema = new mongoose.Schema({
        * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
        * @returns {string} The custom error message for the validation failure.
        */
-      message: props => 'If \'sizeHeight\' is provided, \'sizeWidth\' must also be provided.'
+      message: props => 'If \'sizeHeight\' is provided, \'sizeWidth\' must also be provided. \'sizeHeight\' must not be larger than 100 000.'
     }
   },
   sizeWidth: {
@@ -88,14 +88,14 @@ const schema = new mongoose.Schema({
        * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
        * @returns {string} The custom error message for the validation failure.
        */
-      message: props => 'If \'sizeWidth\' is provided, \'sizeHeight\' must also be provided.'
+      message: props => 'If \'sizeWidth\' is provided, \'sizeHeight\' must also be provided. \'sizeWidth\' must not be larger than 100 000.'
     }
   },
   manufacturer: {
     type: String,
     required: false,
     trim: true,
-    maxLength: [100, 'The manufacturer must not contain more than 100 characters'],
+    maxLength: [50, 'The manufacturer must not contain more than 50 characters.'],
     validate: {
       /**
        * Validates that the submitted title is a string.
@@ -105,7 +105,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:; ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:;! ]+$/.test(value)
       }
     }
   },
@@ -118,7 +118,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: false,
     trim: true,
-    maxLength: [100, 'The location must not contain more than 100 characters'],
+    maxLength: [100, 'The location must not contain more than 100 characters.'],
     validate: {
       /**
        * Validates that the submitted title is a string.
@@ -128,7 +128,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:; ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:;! ]+$/.test(value)
       }
     }
   },
@@ -182,13 +182,13 @@ const schema = new mongoose.Schema({
     type: String,
     required: false,
     trim: true,
-    maxLength: [1000, 'The private note must not contain more than 1 000 characters']
+    maxLength: [1000, 'The private note must not contain more than 1 000 characters.']
   },
   sharedNote: {
     type: String,
     required: false,
     trim: true,
-    maxLength: [1000, 'The shared note must not contain more than 1 000 characters']
+    maxLength: [1000, 'The shared note must not contain more than 1 000 characters.']
   },
   isPrivate: {
     type: Boolean,
@@ -245,7 +245,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: false,
     trim: true,
-    maxLength: [50, 'The name of the person the puzzle is lent out to must not contain more than 50 characters'],
+    maxLength: [50, 'The name of the person the puzzle is lent out to must not contain more than 50 characters.'],
     validate: {
       /**
        * Validates that the name of the person the puzzle is lent out to only contains letters, numbers, and spaces.
@@ -254,7 +254,7 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the submitted name is valid, otherwise false.
        */
       validator: function (value) {
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:; ]+$/.test(value)
+        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:;! ]+$/.test(value)
       },
       /**
        * This message is shown when the validation fails,
