@@ -98,35 +98,43 @@ export class PuzzleController {
   async getPuzzle (req, res, next) {
     try {
       const puzzle = req.puzzle
-      let responseData
-      if (puzzle.image !== null) {
-        const imageBase64 = puzzle.image.toString('base64')
-        const { _id, image, owner, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
-        responseData = {
-          ...puzzleData,
-          imageUrl: `data:image/png;base64,${imageBase64}`
-        }
-      } else {
-        const { _id, image, owner, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
-        responseData = {
-          ...puzzleData
-        }
-      }
-      if (puzzle.privateNote) {
-        const { iv, encryptedData } = JSON.parse(puzzle.privateNote)
-        const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
-        const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'))
-        let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
-        decrypted += decipher.final('utf8')
-        responseData.privateNote = decrypted
-      }
-      // res.type('png').send(puzzle)
-      // res.status(200).type('png').json({ puzzle })
-      // console.log(responseData)
+      const responseData = this.#transformPuzzleData(puzzle)
       res.status(200).json(responseData)
     } catch (error) {
       next(error)
     }
+  }
+
+  /**
+   * Transforms the data of a puzzle to a format that can be sent as a response.
+   *
+   * @param {object} puzzle - The puzzle to transform.
+   * @returns {object} The transformed puzzle data.
+   */
+  #transformPuzzleData (puzzle) {
+    let responseData
+    if (puzzle.image !== null) {
+      const imageBase64 = puzzle.image.toString('base64')
+      const { _id, image, owner, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+      responseData = {
+        ...puzzleData,
+        imageUrl: `data:image/png;base64,${imageBase64}`
+      }
+    } else {
+      const { _id, image, owner, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+      responseData = {
+        ...puzzleData
+      }
+    }
+    if (puzzle.privateNote) {
+      const { iv, encryptedData } = JSON.parse(puzzle.privateNote)
+      const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
+      const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'))
+      let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
+      decrypted += decipher.final('utf8')
+      responseData.privateNote = decrypted
+    }
+    return responseData
   }
 
   // TODO: Kolla att denna fungerar i React, blir för stor response i Postman
@@ -144,14 +152,14 @@ export class PuzzleController {
         next(createError(404, 'No puzzles found'))
         return
       }
-      puzzles.forEach(puzzle => {
+      const updatedPuzzles = puzzles.map(puzzle => {
         if (puzzle.image === null) {
-          return
+          return { ...puzzle.toObject() }
         }
         const imageBase64 = puzzle.image.toString('base64')
-        puzzle.imageUrl = `data:image/png;base64,${imageBase64}`
+        return { ...puzzle.toObject(), imageUrl: `data:image/png;base64,${imageBase64}` }
       })
-      res.status(200).json(puzzles)
+      res.status(200).json(updatedPuzzles)
     } catch (error) {
       next(error)
     }
