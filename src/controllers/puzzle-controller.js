@@ -134,6 +134,10 @@ export class PuzzleController {
       decrypted += decipher.final('utf8')
       responseData.privateNote = decrypted
     }
+    if (puzzle.lastPlayed) {
+      const lastPlayed = new Date(puzzle.lastPlayed)
+      responseData.lastPlayed = lastPlayed.toISOString().slice(0, 10)
+    }
     return responseData
   }
 
