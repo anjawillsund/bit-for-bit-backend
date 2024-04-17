@@ -51,25 +51,6 @@ export class UserController {
     }
   }
 
-  // /**
-  //  * Gets a users groups from the database.
-  //  *
-  //  * @param {object} req - Express request object.
-  //  * @param {object} res - Express response object.
-  //  * @param {Function} next - Express next middleware function.
-  //  */
-  // async getUserGroups (req, res, next) {
-  //   try {
-  //     const user = await User.findOne({ _id: req.user.userId })
-  //     const groups = user.groups
-  //     res.status(200).json({ groups })
-  //     console.log('Groups retrieved successfully.')
-  //   } catch (error) {
-  //     console.log(error)
-  //     next(error)
-  //   }
-  // }
-
   /**
    * Creates a new user account.
    *
@@ -105,33 +86,6 @@ export class UserController {
       next(error)
     }
   }
-
-  // /**
-  //  * Adds a new group to the user's account.
-  //  *
-  //  * @param {object} req - Express request object.
-  //  * @param {object} res - Express response object.
-  //  * @param {Function} next - Express next middleware function.
-  //  **/
-  // async addGroup (req, res, next) {
-  //   const token = req.headers.authorization?.split(' ')[1]
-  //   const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
-
-  //   try {
-  //     const user = await User.findOne({ _id: decodedToken.userId })
-  //     if (user) {
-  //       user.updateOne({ $push: { groups: req.body.groupcode } }).exec()
-  //       console.log('Group added to user.')
-  //       res.status(200).send('Group added successfully.')
-  //     } else {
-  //       throw new Error('An unknown error occured. Please try again.')
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //     error.status = 400
-  //     next(error)
-  //   }
-  // }
 
   /**
    * Get a copy of the fetched array to the database.
