@@ -35,10 +35,19 @@ try {
 
   // Add headers to allow cross origin requests.
   app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', process.env.ORIGIN)
-    // TODO: Se över dessa
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
-    res.header('Access-Control-Allow-Methods', 'POST')
+    const allowedOrigins = [process.env.ORIGIN, process.env.FRONTEND]
+    const origin = req.headers.origin
+
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin)
+    }
+
+    if (req.method === 'OPTIONS') {
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+      return res.sendStatus(200)
+    }
+
     next()
   })
 
