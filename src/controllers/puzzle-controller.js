@@ -26,19 +26,19 @@ export class PuzzleController {
       const imageBinary = await this.#convertImageToPng(req)
       const puzzle = new Puzzle({
         title: req.body.title,
-        piecesNumber: req.body.piecesNumber,
-        sizeHeight: req.body.sizeHeight,
-        sizeWidth: req.body.sizeWidth,
-        manufacturer: req.body.manufacturer,
+        ...(req.body.piecesNumber && { piecesNumber: req.body.piecesNumber }),
+        ...(req.body.sizeHeight && { sizeHeight: req.body.sizeHeight }),
+        ...(req.body.sizeWidth && { sizeWidth: req.body.sizeWidth }),
+        ...(req.body.manufacturer && { manufacturer: req.body.manufacturer }),
         lastPlayed: req.body.lastPlayed,
-        location: req.body.location,
+        ...(req.body.location && { location: req.body.location }),
         complete: req.body.complete,
-        missingPiecesNumber: req.body.missingPiecesNumber,
+        ...(req.body.missingPiecesNumber && { missingPiecesNumber: req.body.missingPiecesNumber }),
         privateNote: req.body.privateNote,
         sharedNote: req.body.sharedNote,
         isLentOut: req.body.isLentOut,
-        lentOutTo: req.body.lentOutTo,
-        lentOutToString: req.body.lentOutToString,
+        ...(req.body.lentOutTo && { lentOutTo: req.body.lentOutTo }),
+        ...(req.body.lentOutToString && { lentOutToString: req.body.lentOutToString }),
         isPrivate: req.body.isPrivate,
         image: imageBinary,
         owner: req.user.id
@@ -236,7 +236,7 @@ export class PuzzleController {
     let imageBinary = null
     if (req.file) {
       const pngBuffer = sharp(req.file.buffer)
-        .resize({ width: 1600 })
+        .resize({ width: 500 })
         .png()
         .toBuffer()
       imageBinary = pngBuffer
