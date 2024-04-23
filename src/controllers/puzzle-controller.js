@@ -115,15 +115,17 @@ export class PuzzleController {
     let responseData
     if (puzzle.image !== null) {
       const imageBase64 = puzzle.image.toString('base64')
-      const { _id, image, owner, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+      const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
       responseData = {
         ...puzzleData,
+        id: _id,
         imageUrl: `data:image/png;base64,${imageBase64}`
       }
     } else {
-      const { _id, image, owner, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+      const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
       responseData = {
-        ...puzzleData
+        ...puzzleData,
+        id: _id
       }
     }
     if (puzzle.privateNote) {
