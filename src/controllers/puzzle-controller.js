@@ -236,7 +236,7 @@ export class PuzzleController {
     let imageBinary = null
     if (req.file) {
       const pngBuffer = sharp(req.file.buffer)
-        .resize({ width: 800 })
+        .resize({ width: 500 })
         .png()
         .toBuffer()
       imageBinary = pngBuffer
