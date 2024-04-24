@@ -37,7 +37,7 @@ export class PuzzleController {
         privateNote: req.body.privateNote,
         sharedNote: req.body.sharedNote,
         isLentOut: req.body.isLentOut,
-        ...(req.body.lentOutTo && { lentOutTo: req.body.lentOutTo }),
+        // ...(req.body.lentOutTo && { lentOutTo: req.body.lentOutTo }),
         ...(req.body.lentOutToString && { lentOutToString: req.body.lentOutToString }),
         isPrivate: req.body.isPrivate,
         image: imageBinary,
@@ -180,6 +180,8 @@ export class PuzzleController {
    */
   async updatePuzzle (req, res, next) {
     try {
+      console.log(req.body.isLentOut)
+      console.log(req.body.lentOutToString)
       const imageBinary = await this.#convertImageToPng(req)
       const puzzle = req.puzzle
       puzzle.title = req.body.title || puzzle.title
@@ -195,8 +197,8 @@ export class PuzzleController {
       puzzle.sharedNote = req.body.sharedNote || puzzle.sharedNote
       puzzle.isPrivate = req.body.isPrivate || puzzle.isPrivate
       puzzle.isLentOut = req.body.isLentOut || puzzle.isLentOut
-      puzzle.lentOutTo = req.body.lentOutTo || puzzle.lentOutTo
-      puzzle.lentOutToString = req.body.lentOutToString || puzzle.lentOutToString
+      // puzzle.lentOutTo = req.body.lentOutTo || puzzle.lentOutTo
+      !puzzle.isLentOut ? puzzle.lentOutToString = null : puzzle.lentOutToString = req.body.lentOutToString || puzzle.lentOutToString
       puzzle.image = imageBinary || puzzle.image
       puzzle.save()
       res.status(200).json({ message: 'Puzzle updated successfully.' })
