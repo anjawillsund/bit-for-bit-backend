@@ -180,8 +180,10 @@ export class PuzzleController {
    */
   async updatePuzzle (req, res, next) {
     try {
-      console.log(req.body.isLentOut)
-      console.log(req.body.lentOutToString)
+      console.log(req.body.lastPlayed)
+      if (req.body.lastPlayed) {
+        req.body.lastPlayed = this.#adjustTimeZone(req.body.lastPlayed)
+      }
       const imageBinary = await this.#convertImageToPng(req)
       const puzzle = req.puzzle
       puzzle.title = req.body.title || puzzle.title
@@ -189,7 +191,7 @@ export class PuzzleController {
       puzzle.sizeHeight = req.body.sizeHeight || puzzle.sizeHeight
       puzzle.sizeWidth = req.body.sizeWidth || puzzle.sizeWidth
       puzzle.manufacturer = req.body.manufacturer || puzzle.manufacturer
-      puzzle.lastPlayed = req.body.lastPlayed || puzzle.lastPlayed
+      puzzle.lastPlayed = req.body.lastPlayed || ''
       puzzle.location = req.body.location || puzzle.location
       puzzle.complete = req.body.complete || puzzle.complete
       puzzle.missingPiecesNumber = req.body.missingPiecesNumber || puzzle.missingPiecesNumber
@@ -205,6 +207,18 @@ export class PuzzleController {
     } catch (error) {
       next(error)
     }
+  }
+
+  /**
+   * Adjusts the time zone of a date.
+   *
+   * @param {string} date - The date to adjust.
+   * @returns {Date} The adjusted date.
+   */
+  #adjustTimeZone (date) {
+    const newDate = new Date(date)
+    newDate.setHours(newDate.getHours() + 1)
+    return newDate
   }
 
   /**
