@@ -41,7 +41,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The pieces number must only contain numbers.
-        return /^\d+$/.test(value) && value >= 2 && value <= 20000
+        return value === null || (/^\d+$/.test(value) && value >= 2 && value <= 20000)
       }
     }
   },
@@ -128,7 +128,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:;! ]+$/.test(value)
+        return value === '' || /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:;! ]+$/.test(value)
       }
     }
   },
@@ -166,7 +166,7 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the number of missing pieces is more than 0 and less than the total number of pieces, otherwise false.
        */
       validator: function (value) {
-        return (value >= 1 && value < this.piecesNumber)
+        return value === null || (value >= 1 && value < this.piecesNumber)
       },
       /**
        * This message is shown when the validation fails,
