@@ -180,23 +180,31 @@ export class PuzzleController {
    */
   async updatePuzzle (req, res, next) {
     try {
-      console.log(req.body.lastPlayed)
+      console.log(req.body.complete)
+      console.log(req.body.missingPiecesNumber)
       if (req.body.lastPlayed) {
         req.body.lastPlayed = this.#adjustTimeZone(req.body.lastPlayed)
+      }
+      if (!req.body.piecesNumber) {
+        req.body.complete = true
+        req.body.missingPiecesNumber = ''
+      }
+      if (req.body.complete === true) {
+        req.body.missingPiecesNumber = ''
       }
       const imageBinary = await this.#convertImageToPng(req)
       const puzzle = req.puzzle
       puzzle.title = req.body.title || puzzle.title
-      puzzle.piecesNumber = req.body.piecesNumber || puzzle.piecesNumber
+      req.body.piecesNumber ? puzzle.piecesNumber = req.body.piecesNumber : puzzle.piecesNumber = ''
       puzzle.sizeHeight = req.body.sizeHeight || puzzle.sizeHeight
       puzzle.sizeWidth = req.body.sizeWidth || puzzle.sizeWidth
       puzzle.manufacturer = req.body.manufacturer || puzzle.manufacturer
       puzzle.lastPlayed = req.body.lastPlayed || ''
-      puzzle.location = req.body.location || puzzle.location
-      puzzle.complete = req.body.complete || puzzle.complete
-      puzzle.missingPiecesNumber = req.body.missingPiecesNumber || puzzle.missingPiecesNumber
-      puzzle.privateNote = req.body.privateNote || puzzle.privateNote
-      puzzle.sharedNote = req.body.sharedNote || puzzle.sharedNote
+      req.body.location ? puzzle.location = req.body.location : puzzle.location = ' '
+      puzzle.complete = req.body.complete
+      req.body.missingPiecesNumber ? puzzle.missingPiecesNumber = req.body.missingPiecesNumber : puzzle.missingPiecesNumber = ''
+      req.body.privateNote ? puzzle.privateNote = req.body.privateNote : puzzle.privateNote = ''
+      req.body.sharedNote ? puzzle.sharedNote = req.body.sharedNote : puzzle.sharedNote = ''
       puzzle.isPrivate = req.body.isPrivate || puzzle.isPrivate
       puzzle.isLentOut = req.body.isLentOut || puzzle.isLentOut
       // puzzle.lentOutTo = req.body.lentOutTo || puzzle.lentOutTo
