@@ -105,7 +105,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The title must only contain letters, numbers, and spaces.
-        return /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:;! ]+$/.test(value)
+        return value === '' || /^[a-zA-Z0-9åäöÅÄÖéóèòáà\-.,:;! ]+$/.test(value)
       }
     }
   },
