@@ -189,30 +189,38 @@ export class PuzzleController {
         req.body.complete = true
         req.body.missingPiecesNumber = ''
       }
-      if (req.body.complete === true) {
+      if (req.body.complete === 'true') {
         req.body.missingPiecesNumber = ''
       }
       const imageBinary = await this.#convertImageToPng(req)
       const puzzle = req.puzzle
       puzzle.title = req.body.title || puzzle.title
-      req.body.piecesNumber ? puzzle.piecesNumber = req.body.piecesNumber : puzzle.piecesNumber = ''
-      puzzle.sizeHeight = req.body.sizeHeight || puzzle.sizeHeight
-      puzzle.sizeWidth = req.body.sizeWidth || puzzle.sizeWidth
-      puzzle.manufacturer = req.body.manufacturer || puzzle.manufacturer
+      puzzle.piecesNumber = req.body.piecesNumber || ''
+      puzzle.sizeHeight = req.body.sizeHeight || ''
+      puzzle.sizeWidth = req.body.sizeWidth || ''
+      puzzle.manufacturer = req.body.manufacturer || ''
       puzzle.lastPlayed = req.body.lastPlayed || ''
-      req.body.location ? puzzle.location = req.body.location : puzzle.location = ' '
+      puzzle.location = req.body.location || ''
       puzzle.complete = req.body.complete
-      req.body.missingPiecesNumber ? puzzle.missingPiecesNumber = req.body.missingPiecesNumber : puzzle.missingPiecesNumber = ''
-      req.body.privateNote ? puzzle.privateNote = req.body.privateNote : puzzle.privateNote = ''
-      req.body.sharedNote ? puzzle.sharedNote = req.body.sharedNote : puzzle.sharedNote = ''
-      puzzle.isPrivate = req.body.isPrivate || puzzle.isPrivate
-      puzzle.isLentOut = req.body.isLentOut || puzzle.isLentOut
+      puzzle.missingPiecesNumber = req.body.missingPiecesNumber || null
+      puzzle.privateNote = req.body.privateNote || ''
+      puzzle.sharedNote = req.body.sharedNote || ''
+      puzzle.isPrivate = req.body.isPrivate
+      puzzle.isLentOut = req.body.isLentOut
       // puzzle.lentOutTo = req.body.lentOutTo || puzzle.lentOutTo
       !puzzle.isLentOut ? puzzle.lentOutToString = null : puzzle.lentOutToString = req.body.lentOutToString || puzzle.lentOutToString
       puzzle.image = imageBinary || puzzle.image
-      puzzle.save()
-      res.status(200).json({ message: 'Puzzle updated successfully.' })
+      if (await puzzle.save()) {
+        res.status(200).json({ message: 'Puzzle updated successfully.' })
+      } else {
+        throw new Error(400, 'An unknown error occured. Please try again.')
+      }
     } catch (error) {
+      if (error.message.includes('Puzzle validation failed')) {
+        error.status = 400
+        error.message = 'The puzzle could not be updated. Please try again. ' + error.message
+      }
+      console.log('Error: ' + error.message)
       next(error)
     }
   }
