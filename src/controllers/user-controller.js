@@ -21,6 +21,7 @@ export class UserController {
    */
   async loginPost (req, res, next) {
     try {
+      req.body.username = req.body.username.trim().toLowerCase()
       let token
       // Checks if submitted username and password matches any saved data in database.
       if (await User.authenticate(req.body.username, req.body.password)) {
@@ -60,6 +61,7 @@ export class UserController {
    */
   async createPost (req, res, next) {
     try {
+      req.body.username = req.body.username.trim().toLowerCase()
       const user = new User({
         username: req.body.username,
         password: req.body.password
