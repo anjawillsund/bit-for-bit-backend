@@ -183,6 +183,9 @@ export class PuzzleController {
    */
   async updatePuzzle (req, res, next) {
     try {
+      // Check if the values of the number fields are numbers
+      this.#isNumberFieldNumber(req.body)
+
       if (req.body.lastPlayed) {
         req.body.lastPlayed = this.#adjustTimeZone(req.body.lastPlayed)
       }
@@ -217,12 +220,51 @@ export class PuzzleController {
         throw new Error(400, 'An unknown error occured. Please try again.')
       }
     } catch (error) {
-      if (error.message.includes('Puzzle validation failed')) {
+      const errors = []
+      if (error.message.includes('Puzzle validation failed') || error.message.includes('inte ett giltigt nummer')) {
+        if (error.message.includes('Puzzle validation failed')) {
+          for (const key in error.errors) {
+            if (Object.prototype.hasOwnProperty.call(error.errors, key)) {
+              errors.push(error.errors[key].message)
+            }
+          }
+        } else {
+          errors.push(error.message)
+        }
+        console.log('Error: ' + error.message)
         error.status = 400
-        error.message = 'The puzzle could not be updated. Please try again. ' + error.message
+        error.message = errors
+        next(error)
+      } else {
+        console.log('Error: ' + error.message)
+        next(error)
       }
-      console.log('Error: ' + error.message)
-      next(error)
+    }
+  }
+
+  /**
+   * Checks if the values of the number fields are numbers.
+   *
+   * @param {object} puzzle - The puzzle to check.
+   * @throws {Error} If the values are not numbers.
+   */
+  #isNumberFieldNumber (puzzle) {
+    const fieldsToCheck = {
+      piecesNumber: 'Antal bitar',
+      sizeHeight: 'Höjd',
+      sizeWidth: 'Bredd',
+      missingPiecesNumber: 'Antal saknade bitar'
+    }
+
+    // For each key-value pair in the puzzle object
+    for (const [key, value] of Object.entries(puzzle)) {
+      // Check if the key is present in the fieldsToCheck object
+      if (Object.prototype.hasOwnProperty.call(fieldsToCheck, key)) {
+        if (isNaN(value)) {
+          // If the value is not a number, throw an error
+          throw new Error(`Det angivna värdet för "${fieldsToCheck[key]}" är inte ett giltigt nummer.`)
+        }
+      }
     }
   }
 
