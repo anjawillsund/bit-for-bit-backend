@@ -24,6 +24,9 @@ export class PuzzleController {
   async addPuzzle (req, res, next) {
     try {
       const imageBinary = await this.#convertImageToPng(req)
+      if (req.body.lastPlayed !== '') {
+        req.body.lastPlayed = this.#adjustTimeZone(req.body.lastPlayed)
+      }
       const puzzle = new Puzzle({
         title: req.body.title,
         // Adds the piecesNumber, sizeHeight, sizeWidth, manufacturer, location and missingPiecesNumber property only if it is present in the request body
@@ -180,8 +183,6 @@ export class PuzzleController {
    */
   async updatePuzzle (req, res, next) {
     try {
-      console.log(req.body.complete)
-      console.log(req.body.missingPiecesNumber)
       if (req.body.lastPlayed) {
         req.body.lastPlayed = this.#adjustTimeZone(req.body.lastPlayed)
       }
@@ -233,7 +234,8 @@ export class PuzzleController {
    */
   #adjustTimeZone (date) {
     const newDate = new Date(date)
-    newDate.setHours(newDate.getHours() + 1)
+    // Add two hours to adjust the time zone to UTC+2 if it's daylight saving time
+    newDate.setHours(newDate.getHours() + 2)
     return newDate
   }
 
