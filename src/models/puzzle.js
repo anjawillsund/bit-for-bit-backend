@@ -49,7 +49,7 @@ const schema = new mongoose.Schema({
        */
       validator: function (value) {
         // The pieces number must only contain numbers.
-        return value === null || (/^\d+$/.test(value) && value >= 2 && value <= 20000)
+        return value === null || (value >= 2 && value <= 20000)
       },
       /**
        * This message is shown when the validation fails,
@@ -121,7 +121,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: false,
     trim: true,
-    maxLength: [100, 'Platsen där pusslet förvaras får inte innehålla fler än 100 tecken.']
+    maxLength: [100, 'Namnet på platsen där pusslet förvaras får inte innehålla fler än 100 tecken.']
   },
   complete: {
     type: Boolean,
