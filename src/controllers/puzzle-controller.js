@@ -26,6 +26,7 @@ export class PuzzleController {
       const imageBinary = await this.#convertImageToPng(req)
       const puzzle = new Puzzle({
         title: req.body.title,
+        // Adds the piecesNumber, sizeHeight, sizeWidth, manufacturer, location and missingPiecesNumber property only if it is present in the request body
         ...(req.body.piecesNumber && { piecesNumber: req.body.piecesNumber }),
         ...(req.body.sizeHeight && { sizeHeight: req.body.sizeHeight }),
         ...(req.body.sizeWidth && { sizeWidth: req.body.sizeWidth }),
@@ -143,7 +144,6 @@ export class PuzzleController {
     return responseData
   }
 
-  // TODO: Kolla att denna fungerar i React, blir för stor response i Postman
   /**
    * Gets all puzzles for the authenticated user.
    *
