@@ -46,19 +46,10 @@ export class PuzzleController {
         owner: req.user.id
       })
 
-      const response = await puzzle.save()
-      if (!response.ok) {
-        console.log(response)
-      }
-      res.status(201).json({ id: response.id, message: 'Puzzle added successfully.' })
+      await puzzle.save()
+      res.status(200).json({ message: 'Puzzle updated successfully.' })
     } catch (error) {
-      // TODO: Titta på denna felhantering
-      if (error.message === 'offset is out of bounds') {
-        error.message = 'Image is too large. Maximum size is 10 MB.'
-      }
-      console.log('Error: ' + error.message)
-      error.status = 400
-      next(error)
+      this.#handleAddOrUpdateError(error, next)
     }
   }
 
@@ -67,6 +58,7 @@ export class PuzzleController {
    *
    * @param {object} req - Express request object.
    * @returns {object} The updated puzzle input.
+   * @throws {Error} If the puzzle is lent out and the name of the person who borrowed the puzzle is not specified.
    */
   async #updatePuzzleInput (req) {
     const puzzle = req.body
@@ -88,6 +80,9 @@ export class PuzzleController {
     }
     if (puzzle.isLentOut === 'false') {
       puzzle.lentOutToString = null
+    }
+    if (puzzle.isLentOut === 'true' && !puzzle.lentOutToString) {
+      throw new Error('Namnet på den som har lånat pusslet måste anges.')
     }
     return puzzle
   }
@@ -232,31 +227,41 @@ export class PuzzleController {
       !puzzle.isLentOut ? puzzle.lentOutToString = null : puzzle.lentOutToString = puzzleInput.lentOutToString || puzzle.lentOutToString
       puzzle.image = puzzleInput.imageBinary || puzzle.image
 
-      if (await puzzle.save()) {
-        res.status(200).json({ message: 'Puzzle updated successfully.' })
-      } else {
-        throw new Error(400, 'An unknown error occured. Please try again.')
-      }
+      await puzzle.save()
+      res.status(200).json({ message: 'Puzzle updated successfully.' })
     } catch (error) {
+      this.#handleAddOrUpdateError(error, next)
+    }
+  }
+
+  /**
+   * Handles errors when adding or updating a puzzle.
+   *
+   * @param {Error} error - The error to handle.
+   * @param {Function} next - Express next middleware function.
+   */
+  #handleAddOrUpdateError (error, next) {
+    if (error.message.includes('Puzzle validation failed') || error.message.includes('inte ett giltigt nummer') || error.message.includes('Namnet på den som har lånat pusslet måste anges')) {
       const errors = []
-      if (error.message.includes('Puzzle validation failed') || error.message.includes('inte ett giltigt nummer')) {
-        if (error.message.includes('Puzzle validation failed')) {
-          for (const key in error.errors) {
-            if (Object.prototype.hasOwnProperty.call(error.errors, key)) {
-              errors.push(error.errors[key].message)
-            }
+      if (error.message.includes('Puzzle validation failed')) {
+        for (const key in error.errors) {
+          if (Object.prototype.hasOwnProperty.call(error.errors, key)) {
+            errors.push(error.errors[key].message)
           }
-        } else {
-          errors.push(error.message)
         }
-        console.log('Error: ' + error.message)
-        error.status = 400
-        error.message = errors
-        next(error)
       } else {
-        console.log('Error: ' + error.message)
-        next(error)
+        errors.push(error.message)
       }
+      error.status = 400
+      error.message = errors
+      next(error)
+    } else if (error.message === 'offset is out of bounds') {
+      error.message = 'Bilden är för stor, max 10 MB.'
+      error.status = 400
+      next(error)
+    } else {
+      console.log('Error: ' + error.message)
+      next(error)
     }
   }
 
