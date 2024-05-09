@@ -23,30 +23,29 @@ export class PuzzleController {
    */
   async addPuzzle (req, res, next) {
     try {
-      const imageBinary = await this.#convertImageToPng(req)
-      if (req.body.lastPlayed !== '') {
-        req.body.lastPlayed = this.#adjustTimeZone(req.body.lastPlayed)
-      }
+      const puzzleInput = await this.#updatePuzzleInput(req)
+
       const puzzle = new Puzzle({
-        title: req.body.title,
+        title: puzzleInput.title,
         // Adds the piecesNumber, sizeHeight, sizeWidth, manufacturer, location and missingPiecesNumber property only if it is present in the request body
-        ...(req.body.piecesNumber && { piecesNumber: req.body.piecesNumber }),
-        ...(req.body.sizeHeight && { sizeHeight: req.body.sizeHeight }),
-        ...(req.body.sizeWidth && { sizeWidth: req.body.sizeWidth }),
-        ...(req.body.manufacturer && { manufacturer: req.body.manufacturer }),
-        lastPlayed: req.body.lastPlayed,
-        ...(req.body.location && { location: req.body.location }),
-        complete: req.body.complete,
-        ...(req.body.missingPiecesNumber && { missingPiecesNumber: req.body.missingPiecesNumber }),
-        privateNote: req.body.privateNote,
-        sharedNote: req.body.sharedNote,
-        isLentOut: req.body.isLentOut,
-        // ...(req.body.lentOutTo && { lentOutTo: req.body.lentOutTo }),
-        ...(req.body.lentOutToString && { lentOutToString: req.body.lentOutToString }),
-        isPrivate: req.body.isPrivate,
-        image: imageBinary,
+        ...(puzzleInput.piecesNumber && { piecesNumber: puzzleInput.piecesNumber }),
+        ...(puzzleInput.sizeHeight && { sizeHeight: puzzleInput.sizeHeight }),
+        ...(puzzleInput.sizeWidth && { sizeWidth: puzzleInput.sizeWidth }),
+        ...(puzzleInput.manufacturer && { manufacturer: puzzleInput.manufacturer }),
+        lastPlayed: puzzleInput.lastPlayed,
+        ...(puzzleInput.location && { location: puzzleInput.location }),
+        complete: puzzleInput.complete,
+        ...(puzzleInput.missingPiecesNumber && { missingPiecesNumber: puzzleInput.missingPiecesNumber }),
+        privateNote: puzzleInput.privateNote,
+        sharedNote: puzzleInput.sharedNote,
+        isLentOut: puzzleInput.isLentOut,
+        // ...(puzzleInput.lentOutTo && { lentOutTo: puzzleInput.lentOutTo }),
+        ...(puzzleInput.lentOutToString && { lentOutToString: puzzleInput.lentOutToString }),
+        isPrivate: puzzleInput.isPrivate,
+        image: puzzleInput.imageBinary,
         owner: req.user.id
       })
+
       const response = await puzzle.save()
       if (!response.ok) {
         console.log(response)
@@ -61,6 +60,36 @@ export class PuzzleController {
       error.status = 400
       next(error)
     }
+  }
+
+  /**
+   * Updates the puzzle input.
+   *
+   * @param {object} req - Express request object.
+   * @returns {object} The updated puzzle input.
+   */
+  async #updatePuzzleInput (req) {
+    const puzzle = req.body
+    // Convert the image to a PNG
+    puzzle.imageBinary = await this.#convertImageToPng(req)
+
+    // Check if the values of the number fields are numbers
+    this.#isNumberFieldNumber(puzzle)
+
+    if (puzzle.lastPlayed) {
+      puzzle.lastPlayed = this.#adjustTimeZone(puzzle.lastPlayed)
+    }
+    if (!puzzle.piecesNumber) {
+      puzzle.complete = true
+      puzzle.missingPiecesNumber = ''
+    }
+    if (puzzle.complete === 'true') {
+      puzzle.missingPiecesNumber = ''
+    }
+    if (puzzle.isLentOut === 'false') {
+      puzzle.lentOutToString = null
+    }
+    return puzzle
   }
 
   /**
@@ -183,37 +212,26 @@ export class PuzzleController {
    */
   async updatePuzzle (req, res, next) {
     try {
-      // Check if the values of the number fields are numbers
-      this.#isNumberFieldNumber(req.body)
+      const puzzleInput = await this.#updatePuzzleInput(req)
 
-      if (req.body.lastPlayed) {
-        req.body.lastPlayed = this.#adjustTimeZone(req.body.lastPlayed)
-      }
-      if (!req.body.piecesNumber) {
-        req.body.complete = true
-        req.body.missingPiecesNumber = ''
-      }
-      if (req.body.complete === 'true') {
-        req.body.missingPiecesNumber = ''
-      }
-      const imageBinary = await this.#convertImageToPng(req)
       const puzzle = req.puzzle
-      puzzle.title = req.body.title || puzzle.title
-      puzzle.piecesNumber = req.body.piecesNumber || ''
-      puzzle.sizeHeight = req.body.sizeHeight || ''
-      puzzle.sizeWidth = req.body.sizeWidth || ''
-      puzzle.manufacturer = req.body.manufacturer || ''
-      puzzle.lastPlayed = req.body.lastPlayed || ''
-      puzzle.location = req.body.location || ''
-      puzzle.complete = req.body.complete
-      puzzle.missingPiecesNumber = req.body.missingPiecesNumber || null
-      puzzle.privateNote = req.body.privateNote || ''
-      puzzle.sharedNote = req.body.sharedNote || ''
-      puzzle.isPrivate = req.body.isPrivate
-      puzzle.isLentOut = req.body.isLentOut
-      // puzzle.lentOutTo = req.body.lentOutTo || puzzle.lentOutTo
-      !puzzle.isLentOut ? puzzle.lentOutToString = null : puzzle.lentOutToString = req.body.lentOutToString || puzzle.lentOutToString
-      puzzle.image = imageBinary || puzzle.image
+      puzzle.title = puzzleInput.title || puzzle.title
+      puzzle.piecesNumber = puzzleInput.piecesNumber || ''
+      puzzle.sizeHeight = puzzleInput.sizeHeight || ''
+      puzzle.sizeWidth = puzzleInput.sizeWidth || ''
+      puzzle.manufacturer = puzzleInput.manufacturer || ''
+      puzzle.lastPlayed = puzzleInput.lastPlayed || ''
+      puzzle.location = puzzleInput.location || ''
+      puzzle.complete = puzzleInput.complete
+      puzzle.missingPiecesNumber = puzzleInput.missingPiecesNumber || null
+      puzzle.privateNote = puzzleInput.privateNote || ''
+      puzzle.sharedNote = puzzleInput.sharedNote || ''
+      puzzle.isPrivate = puzzleInput.isPrivate
+      puzzle.isLentOut = puzzleInput.isLentOut
+      // puzzle.lentOutTo = puzzleInput.lentOutTo || puzzle.lentOutTo
+      !puzzle.isLentOut ? puzzle.lentOutToString = null : puzzle.lentOutToString = puzzleInput.lentOutToString || puzzle.lentOutToString
+      puzzle.image = puzzleInput.imageBinary || puzzle.image
+
       if (await puzzle.save()) {
         res.status(200).json({ message: 'Puzzle updated successfully.' })
       } else {
