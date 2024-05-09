@@ -54,40 +54,6 @@ export class PuzzleController {
   }
 
   /**
-   * Updates the puzzle input.
-   *
-   * @param {object} req - Express request object.
-   * @returns {object} The updated puzzle input.
-   * @throws {Error} If the puzzle is lent out and the name of the person who borrowed the puzzle is not specified.
-   */
-  async #updatePuzzleInput (req) {
-    const puzzle = req.body
-    // Convert the image to a PNG
-    puzzle.imageBinary = await this.#convertImageToPng(req)
-
-    // Check if the values of the number fields are numbers
-    this.#isNumberFieldNumber(puzzle)
-
-    if (puzzle.lastPlayed) {
-      puzzle.lastPlayed = this.#adjustTimeZone(puzzle.lastPlayed)
-    }
-    if (!puzzle.piecesNumber) {
-      puzzle.complete = true
-      puzzle.missingPiecesNumber = ''
-    }
-    if (puzzle.complete === 'true') {
-      puzzle.missingPiecesNumber = ''
-    }
-    if (puzzle.isLentOut === 'false') {
-      puzzle.lentOutToString = null
-    }
-    if (puzzle.isLentOut === 'true' && !puzzle.lentOutToString) {
-      throw new Error('Namnet på den som har lånat pusslet måste anges.')
-    }
-    return puzzle
-  }
-
-  /**
    * Gets a specific puzzle.
    *
    * @param {object} req - Express request object.
@@ -168,6 +134,7 @@ export class PuzzleController {
       const lastPlayed = new Date(puzzle.lastPlayed)
       responseData.lastPlayed = lastPlayed.toISOString().slice(0, 10)
     }
+    console.log(responseData)
     return responseData
   }
 
@@ -263,6 +230,40 @@ export class PuzzleController {
       console.log('Error: ' + error.message)
       next(error)
     }
+  }
+
+  /**
+   * Updates the puzzle input.
+   *
+   * @param {object} req - Express request object.
+   * @returns {object} The updated puzzle input.
+   * @throws {Error} If the puzzle is lent out and the name of the person who borrowed the puzzle is not specified.
+   */
+  async #updatePuzzleInput (req) {
+    const puzzle = req.body
+    // Convert the image to a PNG
+    puzzle.imageBinary = await this.#convertImageToPng(req)
+
+    // Check if the values of the number fields are numbers
+    this.#isNumberFieldNumber(puzzle)
+
+    if (puzzle.lastPlayed) {
+      puzzle.lastPlayed = this.#adjustTimeZone(puzzle.lastPlayed)
+    }
+    if (!puzzle.piecesNumber) {
+      puzzle.complete = true
+      puzzle.missingPiecesNumber = ''
+    }
+    if (puzzle.complete === 'true') {
+      puzzle.missingPiecesNumber = ''
+    }
+    if (puzzle.isLentOut === 'false') {
+      puzzle.lentOutToString = null
+    }
+    if (puzzle.isLentOut === 'true' && !puzzle.lentOutToString) {
+      throw new Error('Namnet på den som har lånat pusslet måste anges.')
+    }
+    return puzzle
   }
 
   /**
