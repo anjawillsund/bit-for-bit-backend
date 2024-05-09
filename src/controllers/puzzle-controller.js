@@ -100,45 +100,6 @@ export class PuzzleController {
   }
 
   /**
-   * Transforms the data of a puzzle to a format that can be sent as a response.
-   *
-   * @param {object} puzzle - The puzzle to transform.
-   * @returns {object} The transformed puzzle data.
-   */
-  #transformPuzzleData (puzzle) {
-    let responseData
-    if (puzzle.image !== null) {
-      const imageBase64 = puzzle.image.toString('base64')
-      const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
-      responseData = {
-        ...puzzleData,
-        id: _id.toString(),
-        imageUrl: `data:image/png;base64,${imageBase64}`
-      }
-    } else {
-      const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
-      responseData = {
-        ...puzzleData,
-        id: _id.toString()
-      }
-    }
-    if (puzzle.privateNote) {
-      const { iv, encryptedData } = JSON.parse(puzzle.privateNote)
-      const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
-      const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'))
-      let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
-      decrypted += decipher.final('utf8')
-      responseData.privateNote = decrypted
-    }
-    if (puzzle.lastPlayed) {
-      const lastPlayed = new Date(puzzle.lastPlayed)
-      responseData.lastPlayed = lastPlayed.toISOString().slice(0, 10)
-    }
-    console.log(responseData)
-    return responseData
-  }
-
-  /**
    * Gets all puzzles for the authenticated user.
    *
    * @param {object} req - Express request object.
@@ -199,6 +160,68 @@ export class PuzzleController {
     } catch (error) {
       this.#handleAddOrUpdateError(error, next)
     }
+  }
+
+  /**
+   * Deletes a specific puzzle by id.
+   *
+   * @param {object} req - Express request object.
+   * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
+   */
+  async deletePuzzle (req, res, next) {
+    try {
+      console.log(req)
+      const puzzle = await Puzzle.deleteOne({ _id: req.puzzle.id.toString() })
+      if (puzzle.deletedCount === 1) {
+        console.log('Puzzle was deleted successfully.')
+        req.message = 'Puzzle was deleted successfully.'
+      } else {
+        throw new Error('An unknown error occured. Please try again.')
+      }
+      res.status(204).send()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Transforms the data of a puzzle to a format that can be sent as a response.
+   *
+   * @param {object} puzzle - The puzzle to transform.
+   * @returns {object} The transformed puzzle data.
+   */
+  #transformPuzzleData (puzzle) {
+    let responseData
+    if (puzzle.image !== null) {
+      const imageBase64 = puzzle.image.toString('base64')
+      const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+      responseData = {
+        ...puzzleData,
+        id: _id.toString(),
+        imageUrl: `data:image/png;base64,${imageBase64}`
+      }
+    } else {
+      const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+      responseData = {
+        ...puzzleData,
+        id: _id.toString()
+      }
+    }
+    if (puzzle.privateNote) {
+      const { iv, encryptedData } = JSON.parse(puzzle.privateNote)
+      const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
+      const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'))
+      let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
+      decrypted += decipher.final('utf8')
+      responseData.privateNote = decrypted
+    }
+    if (puzzle.lastPlayed) {
+      const lastPlayed = new Date(puzzle.lastPlayed)
+      responseData.lastPlayed = lastPlayed.toISOString().slice(0, 10)
+    }
+    console.log(responseData)
+    return responseData
   }
 
   /**
@@ -303,29 +326,6 @@ export class PuzzleController {
     // Add two hours to adjust the time zone to UTC+2 if it's daylight saving time
     newDate.setHours(newDate.getHours() + 2)
     return newDate
-  }
-
-  /**
-   * Deletes a specific puzzle by id.
-   *
-   * @param {object} req - Express request object.
-   * @param {object} res - Express response object.
-   * @param {Function} next - Express next middleware function.
-   */
-  async deletePuzzle (req, res, next) {
-    try {
-      console.log(req)
-      const puzzle = await Puzzle.deleteOne({ _id: req.puzzle.id.toString() })
-      if (puzzle.deletedCount === 1) {
-        console.log('Puzzle was deleted successfully.')
-        req.message = 'Puzzle was deleted successfully.'
-      } else {
-        throw new Error('An unknown error occured. Please try again.')
-      }
-      res.status(204).send()
-    } catch (error) {
-      next(error)
-    }
   }
 
   /**
