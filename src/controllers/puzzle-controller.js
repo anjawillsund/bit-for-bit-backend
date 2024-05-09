@@ -9,6 +9,9 @@ import crypto from 'crypto'
 import createError from 'http-errors'
 import sharp from 'sharp'
 import { Puzzle } from '../models/puzzle.js'
+import fs from 'fs'
+
+// import nullPuzzle from '../assets/images/null-puzzle.jpg'
 
 /**
  * Encapsulates a controller.
@@ -92,7 +95,8 @@ export class PuzzleController {
   async getPuzzle (req, res, next) {
     try {
       const puzzle = req.puzzle
-      const responseData = this.#transformPuzzleData(puzzle)
+      const responseData = await this.#transformPuzzleData(puzzle)
+      console.log(responseData)
       res.status(200).json(responseData)
     } catch (error) {
       next(error)
@@ -171,7 +175,6 @@ export class PuzzleController {
    */
   async deletePuzzle (req, res, next) {
     try {
-      console.log(req)
       const puzzle = await Puzzle.deleteOne({ _id: req.puzzle.id.toString() })
       if (puzzle.deletedCount === 1) {
         console.log('Puzzle was deleted successfully.')
@@ -191,37 +194,63 @@ export class PuzzleController {
    * @param {object} puzzle - The puzzle to transform.
    * @returns {object} The transformed puzzle data.
    */
-  #transformPuzzleData (puzzle) {
-    let responseData
+  async #transformPuzzleData (puzzle) {
+    let responseData = {}
+    let imageBase64
     if (puzzle.image !== null) {
-      const imageBase64 = puzzle.image.toString('base64')
-      const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
-      responseData = {
-        ...puzzleData,
-        id: _id.toString(),
-        imageUrl: `data:image/png;base64,${imageBase64}`
-      }
+      imageBase64 = puzzle.image.toString('base64')
     } else {
-      const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
-      responseData = {
-        ...puzzleData,
-        id: _id.toString()
-      }
+      const nullImage = './src/assets/images/null-puzzle.png'
+      imageBase64 = await this.#convertImageToBase64(nullImage)
+    }
+    const { _id, image, createdAt, updatedAt, __v, ...puzzleData } = puzzle.toJSON()
+    responseData = {
+      ...puzzleData,
+      id: _id.toString(),
+      imageUrl: `data:image/png;base64,${imageBase64}`
     }
     if (puzzle.privateNote) {
-      const { iv, encryptedData } = JSON.parse(puzzle.privateNote)
-      const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
-      const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'))
-      let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
-      decrypted += decipher.final('utf8')
-      responseData.privateNote = decrypted
+      responseData.privateNote = this.#decryptPrivateNote(puzzle.privateNote)
     }
     if (puzzle.lastPlayed) {
       const lastPlayed = new Date(puzzle.lastPlayed)
       responseData.lastPlayed = lastPlayed.toISOString().slice(0, 10)
     }
-    console.log(responseData)
     return responseData
+  }
+
+  /**
+   * Decrypts a private note.
+   *
+   * @param {string} privateNote - The private note to decrypt.
+   * @returns {string} The decrypted private note.
+   */
+  #decryptPrivateNote (privateNote) {
+    const { iv, encryptedData } = JSON.parse(privateNote)
+    const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'))
+    let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
+    decrypted += decipher.final('utf8')
+    return decrypted
+  }
+
+  /**
+   * Converts an image to a base64 string.
+   *
+   * @param {string} filePath - The path to the image to convert.
+   * @returns {string} The image as a base64 string.
+   */
+  async #convertImageToBase64 (filePath) {
+    return new Promise((resolve, reject) => {
+      fs.readFile(filePath, (error, data) => {
+        if (error) {
+          reject(error)
+        } else {
+          const base64String = Buffer.from(data).toString('base64')
+          resolve(base64String)
+        }
+      })
+    })
   }
 
   /**
@@ -343,6 +372,7 @@ export class PuzzleController {
         .toBuffer()
       imageBinary = pngBuffer
     }
+    // console.log(await imageBinary)
     return imageBinary
   }
 }
