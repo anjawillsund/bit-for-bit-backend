@@ -87,12 +87,20 @@ export class UserController {
    *
    * @param {object} req - Express request object.
    * @param {object} res - Express response object.
+   * @param {Function} next - Express next middleware function.
    */
-  async logout (req, res) {
+  async logout (req, res, next) {
+    try {
     // Destroys the session when logging out.
-    req.session.destroy(() => {
-      console.log('User logged out successfully.')
-      res.status(200).json()
-    })
+      req.session.destroy(() => {
+        console.log('User logged out successfully.')
+        res.status(200).json()
+      })
+    } catch (error) {
+      console.log('Error: ' + error.message)
+      error.message('Fel vid utloggning. Vänligen försök igen.')
+      error.status = 400
+      next(error)
+    }
   }
 }
