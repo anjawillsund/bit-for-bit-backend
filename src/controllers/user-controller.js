@@ -91,8 +91,8 @@ export class UserController {
   async logout (req, res) {
     // Destroys the session when logging out.
     req.session.destroy(() => {
-      res.status(200)
       console.log('User logged out successfully.')
+      res.status(200).json()
     })
   }
 }
