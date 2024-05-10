@@ -75,6 +75,14 @@ export class UserController {
     } catch (error) {
       if (error.message.includes('E11000 duplicate key error collection')) {
         error.message = 'Användarnamnet är inte tillgängligt.'
+      } else if (error.message.includes('User validation failed:')) {
+        let type
+        if (error.message.includes('username:')) {
+          type = 'Användarnamnet'
+        } else if (error.message.includes('password:')) {
+          type = 'Lösenordet'
+        }
+        error.message = type + ' får inte vara tomt.'
       }
       console.log(error)
       error.status = 400
