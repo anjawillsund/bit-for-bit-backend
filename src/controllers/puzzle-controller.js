@@ -260,7 +260,7 @@ export class PuzzleController {
    * @param {Function} next - Express next middleware function.
    */
   #handleAddOrUpdateError (error, next) {
-    if (error.message.includes('Puzzle validation failed') || error.message.includes('inte ett giltigt nummer') || error.message.includes('Namnet på den som har lånat pusslet måste anges')) {
+    if (error.message.includes('Puzzle validation failed') || error.message.includes('inte ett giltigt nummer') || error.message.includes('Namnet på den som har lånat pusslet måste anges') || (error.message.includes('Pusslets titel måste anges.'))) {
       const errors = []
       if (error.message.includes('Puzzle validation failed')) {
         for (const key in error.errors) {
@@ -314,6 +314,9 @@ export class PuzzleController {
     }
     if (puzzle.isLentOut === 'true' && !puzzle.lentOutToString) {
       throw new Error('Namnet på den som har lånat pusslet måste anges.')
+    }
+    if (!puzzle.title) {
+      throw new Error('Pusslets titel måste anges.')
     }
     return puzzle
   }
