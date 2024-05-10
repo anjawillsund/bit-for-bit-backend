@@ -16,7 +16,7 @@ const schema = new mongoose.Schema({
     trim: true,
     unique: true,
     minlength: 1,
-    maxlength: [50, 'The username must not contain more than 50 characters.'],
+    maxlength: [50, 'Användarnamnet får inte innehålla fler än 50 tecken.'],
     validate: {
       /**
        * Checks if the username only contains letters and numbers.
@@ -25,14 +25,14 @@ const schema = new mongoose.Schema({
        * @returns {boolean} True if the username only contains letters and numbers.
        */
       validator: (value) => /^[a-zA-Z0-9]+$/.test(value),
-      message: 'The username must only contain letters and numbers.'
+      message: 'Användarnamnet får endast innehålla bokstäver och siffror.'
     }
   },
   password: {
     type: String,
     required: true,
-    minlength: [10, 'The password must contain at least 10 characters.'],
-    maxlength: [2000, 'The password must not contain more than 2000 characters.']
+    minlength: [10, 'Lösenordet måste innehålla minst 10 tecken.'],
+    maxlength: [2000, 'Lösenordet får inte innehålla fler än 2 000 tecken.']
   },
   friends: {
     type: Array
@@ -60,7 +60,7 @@ schema.statics.authenticate = async function (username, password) {
 
   // If no user found or if password is wrong, throw an error.
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    throw new Error('Invalid login attempt. Please try again.')
+    throw new Error('Felaktiga uppgifter. Vänligen testa igen.')
   }
 
   return user
