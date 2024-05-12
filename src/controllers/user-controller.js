@@ -76,13 +76,11 @@ export class UserController {
       if (error.message.includes('E11000 duplicate key error collection')) {
         error.message = 'Användarnamnet är inte tillgängligt.'
       } else if (error.message.includes('User validation failed:')) {
-        let type
         if (error.message.includes('username:')) {
-          type = 'Användarnamnet'
+          error.message = 'Användarnamnet måste innehålla mellan 1-50 tecken.'
         } else if (error.message.includes('password:')) {
-          type = 'Lösenordet'
+          error.message = 'Lösenordet måste innehålla mellan 10-2 000 tecken.'
         }
-        error.message = type + ' får inte vara tomt.'
       }
       console.log(error)
       error.status = 400
