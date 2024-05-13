@@ -50,7 +50,7 @@ export class PuzzleController {
       })
 
       await puzzle.save()
-      res.status(200).json({ message: 'Puzzle updated successfully.' })
+      res.status(201).json({ message: 'Puzzle added successfully.' })
     } catch (error) {
       this.#handleAddOrUpdateError(error, next)
     }
@@ -260,14 +260,17 @@ export class PuzzleController {
    * @param {Function} next - Express next middleware function.
    */
   #handleAddOrUpdateError (error, next) {
+    console.log('Error: ' + error.message)
     if (error.message.includes('Puzzle validation failed') || error.message.includes('inte ett giltigt nummer') || error.message.includes('Namnet på den som har lånat pusslet måste anges') || (error.message.includes('Pusslets titel måste anges.'))) {
       const errors = []
-      if (error.message.includes('Puzzle validation failed')) {
+      if (error.message.includes('Puzzle validation failed') && (!error.message.includes('Invalid Date'))) {
         for (const key in error.errors) {
           if (Object.prototype.hasOwnProperty.call(error.errors, key)) {
             errors.push(error.errors[key].message)
           }
         }
+      } else if (error.message.includes('Invalid Date')) {
+        errors.push('Datumet är ogiltigt.')
       } else {
         errors.push(error.message)
       }
