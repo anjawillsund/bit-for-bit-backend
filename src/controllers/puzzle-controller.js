@@ -261,7 +261,12 @@ export class PuzzleController {
    */
   #handleAddOrUpdateError (error, next) {
     console.log('Error: ' + error.message)
-    if (error.message.includes('Puzzle validation failed') || error.message.includes('inte ett giltigt nummer') || error.message.includes('Namnet på den som har lånat pusslet måste anges') || (error.message.includes('Pusslets titel måste anges.'))) {
+    if (error.message.includes('Puzzle validation failed') ||
+     error.message.includes('inte ett giltigt nummer') ||
+     error.message.includes('Namnet på den som har lånat pusslet måste anges') ||
+     (error.message.includes('Pusslets titel måste anges.')) ||
+     error.message.includes('Antalet saknade bitar kan inte vara fler än antalet bitar.') ||
+     error.message.includes('Datumet är ogiltigt.')) {
       const errors = []
       if (error.message.includes('Puzzle validation failed') && (!error.message.includes('Invalid Date'))) {
         for (const key in error.errors) {
@@ -320,6 +325,9 @@ export class PuzzleController {
     }
     if (!puzzle.title) {
       throw new Error('Pusslets titel måste anges.')
+    }
+    if (!isNaN(puzzle.piecesNumber) && !isNaN(puzzle.missingPiecesNumber) && (parseInt(puzzle.piecesNumber) < parseInt(puzzle.missingPiecesNumber))) {
+      throw new Error('Antalet saknade bitar kan inte vara fler än antalet bitar.')
     }
     return puzzle
   }
