@@ -81,7 +81,7 @@ const schema = new mongoose.Schema({
        * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
        * @returns {string} The custom error message for the validation failure.
        */
-      message: props => 'Om bredd anges måste även höjd anges. Höjden får inte vara större än 100 000.'
+      message: props => 'Om höjd anges måste även bredd anges. Höjden får inte vara större än 100 000.'
     }
   },
   sizeWidth: {
@@ -104,7 +104,7 @@ const schema = new mongoose.Schema({
        * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
        * @returns {string} The custom error message for the validation failure.
        */
-      message: props => 'Om höjd anges måste även bredd anges. Höjden får inte vara större än 100 000.'
+      message: props => 'Om bredd anges måste även höjd anges. Bredden får inte vara större än 100 000.'
     }
   },
   manufacturer: {
