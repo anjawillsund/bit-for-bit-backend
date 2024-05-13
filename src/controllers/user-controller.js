@@ -77,7 +77,7 @@ export class UserController {
         error.message = 'Användarnamnet är inte tillgängligt.'
       } else if (error.message.includes('User validation failed:')) {
         if (error.message.includes('username:')) {
-          error.message = 'Användarnamnet måste innehålla mellan 1-50 tecken.'
+          error.message = 'Användarnamnet måste innehålla mellan 1-50 tecken och får endast innehålla bokstäver och siffror.'
         } else if (error.message.includes('password:')) {
           error.message = 'Lösenordet måste innehålla mellan 10-2 000 tecken.'
         }
