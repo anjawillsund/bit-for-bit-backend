@@ -1,0 +1,3827 @@
+{
+	"info": {
+		"_postman_id": "8317be87-06dd-4045-a594-69b42bdd7a68",
+		"name": "Bit För Bit - Prod",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24606009"
+	},
+	"item": [
+		{
+			"name": "Create user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let newUsername = 'User' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"let newPassword = 'MyPassword' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"pm.collectionVariables.set(\"newUsername\", newUsername);",
+							"pm.collectionVariables.set(\"newPassword\", newPassword);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Ditt konto har skapats! Logga in för att använda applikationen.\");",
+							"});",
+							"",
+							"if (pm.response.code === 201) {",
+							"    let nextUserNumber = parseInt(pm.collectionVariables.get(\"nextUserNumber\"));",
+							"    nextUserNumber+=1;",
+							"    pm.collectionVariables.set(\"nextUserNumber\", nextUserNumber)",
+							"    let username = pm.collectionVariables.get(\"newUsername\");",
+							"    let password = pm.collectionVariables.get(\"newPassword\");",
+							"    pm.collectionVariables.set(\"username\", username);",
+							"    pm.collectionVariables.set(\"password\", password);",
+							"    console.log(username, password)",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{newUsername}}\",\n    \"password\": \"{{newPassword}}\",\n    \"repeatPassword\": \"{{newPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user with existing username",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let userNumber = parseInt(pm.collectionVariables.get(\"nextUserNumber\"));",
+							"userNumber-=1;",
+							"let username = 'User' + userNumber;",
+							"let password = 'MyPassword' + userNumber;",
+							"pm.collectionVariables.set(\"newUsername\", username);",
+							"pm.collectionVariables.set(\"newPassword\", password);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Användarnamnet är inte tillgängligt.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{newUsername}}\",\n    \"password\": \"{{newPassword}}\",\n    \"repeatPassword\": \"{{newPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user without username",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let password = 'MyPassword' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"pm.collectionVariables.set(\"newPassword\", password);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Användarnamnet måste innehålla mellan 1-50 tecken och får endast innehålla bokstäver och siffror.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"\",\n    \"password\": \"{{newPassword}}\",\n    \"repeatPassword\": \"{{newPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user with too long username",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let password = 'MyPassword' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"pm.collectionVariables.set(\"newPassword\", password);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Användarnamnet måste innehålla mellan 1-50 tecken och får endast innehålla bokstäver och siffror.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"ThisIsALongUsernameThatContainsMoreThanFiftyCharacters\",\n    \"password\": \"{{newPassword}}\",\n    \"repeatPassword\": \"{{newPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user with username that has non-allowed characters",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let password = 'MyPassword' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"pm.collectionVariables.set(\"newPassword\", password);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Användarnamnet måste innehålla mellan 1-50 tecken och får endast innehålla bokstäver och siffror.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"my.username\",\n    \"password\": \"{{newPassword}}\",\n    \"repeatPassword\": \"{{newPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user without password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = 'User' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"pm.collectionVariables.set(\"newUsername\", username);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Lösenordet måste innehålla mellan 10-2 000 tecken.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{newUsername}}\",\n    \"password\": \"\",\n    \"repeatPassword\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user with mismatching passwords",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = 'User' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"pm.collectionVariables.set(\"newUsername\", username);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Lösenorden stämmer inte överens. Vänligen försök igen.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{newUsername}}\",\n    \"password\": \"thepassword\",\n    \"repeatPassword\": \"thepasswords\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user with too short password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = 'User' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"pm.collectionVariables.set(\"newUsername\", username);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Lösenordet måste innehålla mellan 10-2 000 tecken.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{newUsername}}\",\n    \"password\": \"password\",\n    \"repeatPassword\": \"password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user with too long password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let username = 'User' + pm.collectionVariables.get(\"nextUserNumber\");",
+							"pm.collectionVariables.set(\"newUsername\", username);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"User creation success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Lösenordet måste innehålla mellan 10-2 000 tecken.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{newUsername}}\",\n    \"password\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"repeatPassword\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login user",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"",
+							"pm.test(\"Access token is present and valid\", function () {",
+							"    // Basic check for JWT structure",
+							"    let tokenParts = jsonData.split('.');",
+							"    pm.expect(tokenParts.length).to.eql(3);",
+							"});",
+							"",
+							"if (jsonData) {",
+							"    const accessToken = jsonData;",
+							"    pm.collectionVariables.set(\"accessToken\", accessToken);",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login without username",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"User login failed message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Felaktiga uppgifter. Vänligen testa igen.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login without password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"User login failed message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Felaktiga uppgifter. Vänligen testa igen.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login with wrong password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"User login failed message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Felaktiga uppgifter. Vänligen testa igen.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"password\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login with non-existing username",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"User login failed message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Felaktiga uppgifter. Vänligen testa igen.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"username\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"if (jsonData.id) {",
+							"    pm.collectionVariables.set(\"puzzleId\", jsonData.id);",
+							"}",
+							"",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Puzzle added successfully.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const numberOfPieces = Math.floor(Math.random() * 20000) + 1;",
+							"pm.collectionVariables.set(\"numberOfPieces\", numberOfPieces)",
+							"const size = Math.floor(Math.random() * 100000) + 1;",
+							"pm.collectionVariables.set(\"size\", size)",
+							"const missingPieces = Math.floor(Math.random() * (numberOfPieces - 1)) + 1;",
+							"pm.collectionVariables.set(\"missingPieces\", missingPieces)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text"
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text"
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text"
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text"
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text"
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text"
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text"
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text"
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text"
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text"
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - title missing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Pusslets titel måste anges.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - title too long",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Titeln får inte innehålla fler än 100 tecken.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "This is a long title that needs to include a lot of characters and spaces because it needs to contain more than 100 characters to prove that the request will fail.",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - too few pieces",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Antalet bitar måste vara ett heltal mellan 2 och 20 000.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - too many pieces",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Antalet bitar måste vara ett heltal mellan 2 och 20 000.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const numberOfPieces = Math.floor(Math.random() * 20000) + 1;",
+							"pm.collectionVariables.set(\"numberOfPieces\", numberOfPieces)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "20001",
+							"type": "text"
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - pieces contain non-numbers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Det angivna värdet för \\\"Antal bitar\\\" är inte ett giltigt nummer.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const numberOfPieces = Math.floor(Math.random() * 20000) + 1;",
+							"pm.collectionVariables.set(\"numberOfPieces\", numberOfPieces)",
+							"const size = Math.floor(Math.random() * 100000) + 1;",
+							"pm.collectionVariables.set(\"size\", size)",
+							"const missingPieces = Math.floor(Math.random() * (numberOfPieces - 1)) + 1;",
+							"pm.collectionVariables.set(\"missingPieces\", missingPieces)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "200st",
+							"type": "text"
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - sizeWidth missing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql('Om höjd anges måste även bredd anges. Höjden får inte vara större än 100 000.');",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const size = Math.floor(Math.random() * 100000) + 1;",
+							"pm.collectionVariables.set(\"size\", size)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text"
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - sizeWidth too large",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Om höjd anges måste även bredd anges. Höjden får inte vara större än 100 000.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const size = Math.floor(Math.random() * 100000) + 1;",
+							"pm.collectionVariables.set(\"size\", size)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "100001",
+							"type": "text"
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text"
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - sizeWidth too small",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Om höjd anges måste även bredd anges. Höjden får inte vara större än 100 000.\");",
+							"    pm.expect(jsonData.message[1]).to.eql(\"Om bredd anges måste även höjd anges. Bredden får inte vara större än 100 000.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const size = Math.floor(Math.random() * 100000) + 1;",
+							"pm.collectionVariables.set(\"size\", size)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text"
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - sizeHeight missing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Om bredd anges måste även höjd anges. Bredden får inte vara större än 100 000.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const size = Math.floor(Math.random() * 100000) + 1;",
+							"pm.collectionVariables.set(\"size\", size)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text"
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - sizeHeight too large",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Om bredd anges måste även höjd anges. Bredden får inte vara större än 100 000.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const size = Math.floor(Math.random() * 100000) + 1;",
+							"pm.collectionVariables.set(\"size\", size)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text"
+						},
+						{
+							"key": "sizeWidth",
+							"value": "100001",
+							"type": "text"
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - sizeHeight too small",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Om höjd anges måste även bredd anges. Höjden får inte vara större än 100 000.\");",
+							"    pm.expect(jsonData.message[1]).to.eql(\"Om bredd anges måste även höjd anges. Bredden får inte vara större än 100 000.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const size = Math.floor(Math.random() * 100000) + 1;",
+							"pm.collectionVariables.set(\"size\", size)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text"
+						},
+						{
+							"key": "sizeWidth",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - manufacturer missing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"if (jsonData.id) {",
+							"    pm.collectionVariables.set(\"puzzleId\", jsonData.id);",
+							"}",
+							"",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Puzzle added successfully.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - manufacturer too long",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Tillverkarens namn får inte innehålla fler än 50 tecken.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "This is a ridiculously long name for a simple puzzle manufacturer",
+							"type": "text"
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - lastPlayed includes letters",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Datumet är ogiltigt.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "2024-01-01am",
+							"type": "text"
+						},
+						{
+							"key": "location",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - location missing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"if (jsonData.id) {",
+							"    pm.collectionVariables.set(\"puzzleId\", jsonData.id);",
+							"}",
+							"",
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle success message\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Puzzle added successfully.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add puzzle - location too long",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Puzzle details are correctly structured\", function () {",
+							"    pm.expect(jsonData).to.have.keys(\"message\");",
+							"});",
+							"",
+							"pm.test(\"Add puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message[0]).to.eql(\"Namnet på platsen där pusslet förvaras får inte innehålla fler än 100 tecken.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/anjawillsund/Desktop/Screenshot 2024-03-18 at 10.45.42.png"
+						},
+						{
+							"key": "title",
+							"value": "{{$randomLoremSentence}}",
+							"type": "text"
+						},
+						{
+							"key": "piecesNumber",
+							"value": "{{numberOfPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeHeight",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sizeWidth",
+							"value": "{{size}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "manufacturer",
+							"value": "{{$randomCompanyName}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lastPlayed",
+							"value": "{{$randomDatePast}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "location",
+							"value": "This is a ridiculously long description of where the puzzle is located, just to prove that it's not possible to add a puzzle with a location that is too long.",
+							"type": "text"
+						},
+						{
+							"key": "complete",
+							"value": "false",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "missingPiecesNumber",
+							"value": "{{missingPieces}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "privateNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sharedNote",
+							"value": "{{$randomLoremParagraph}}",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "isLentOut",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutTo",
+							"value": "660ff2de8cb6c9de5b9e48f4",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lentOutToString",
+							"value": "{{$randomFirstName}}",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all puzzles",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Check if response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"",
+							"// Check if each object in the array has required properties",
+							"jsonData.forEach((puzzle, index) => {",
+							"    pm.test(`Puzzle ${index + 1} has required properties`, function () {",
+							"        pm.expect(puzzle).to.have.property('title');",
+							"        pm.expect(puzzle).to.have.property('complete');",
+							"        pm.expect(puzzle).to.have.property('isPrivate');",
+							"        pm.expect(puzzle).to.have.property('isLentOut');",
+							"        pm.expect(puzzle).to.have.property('id');",
+							"    });",
+							"});",
+							"",
+							"if (pm.response.code === 200) {",
+							"    const puzzleId = jsonData[0].id;",
+							"    pm.collectionVariables.set(\"puzzleId\", puzzleId);",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all puzzles - missing token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Get all puzzles failed message\", function () {",
+							"    pm.expect(jsonData.error).to.eql(\"No token provided.\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get one puzzle",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Check if response is an array",
+							"pm.test(\"Response is an object\", function () {",
+							"    pm.expect(jsonData).to.be.an('object');",
+							"});",
+							"",
+							"pm.test(`Puzzle has required properties`, function () {",
+							"    pm.expect(jsonData).to.have.property('title');",
+							"    pm.expect(jsonData).to.have.property('complete');",
+							"    pm.expect(jsonData).to.have.property('isPrivate');",
+							"    pm.expect(jsonData).to.have.property('isLentOut');",
+							"    pm.expect(jsonData).to.have.property('id');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles/{{puzzleId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles",
+						"{{puzzleId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get one puzzle - invalid puzzle ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Get one puzzle failed message\", function () {",
+							"    pm.expect(jsonData.message).to.eql(\"Invalid id\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles/1234567890",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles",
+						"1234567890"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update puzzle",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Update puzzle successful message\", function () {",
+							"    pm.expect(jsonData.message).to.eql(\"Puzzle updated successfully.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "piecesNumber",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "title",
+							"value": "Puzzle title",
+							"type": "text"
+						},
+						{
+							"key": "complete",
+							"value": "true",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles/{{puzzleId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles",
+						"{{puzzleId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete puzzle",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{baseUrl}}/my/puzzles/{{puzzleId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"my",
+						"puzzles",
+						"{{puzzleId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://cscloud7-156.lnu.se/bfb-backend",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "anja",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "hejhejhejhej",
+			"type": "string"
+		},
+		{
+			"key": "nextUserNumber",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "newUsername",
+			"value": ""
+		},
+		{
+			"key": "newPassword",
+			"value": ""
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "puzzleId",
+			"value": ""
+		},
+		{
+			"key": "numberOfPieces",
+			"value": ""
+		},
+		{
+			"key": "size",
+			"value": ""
+		},
+		{
+			"key": "missingPieces",
+			"value": ""
+		}
+	]
+}
