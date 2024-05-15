@@ -13,6 +13,10 @@ export const router = express.Router()
 
 const controller = new UserController()
 
-router.post('/login', controller.loginPost)
-router.post('/create', controller.createPost)
-router.get('/logout', authenticateToken, controller.logout)
+router.route('/login')
+  .post((req, res, next) => controller.loginPost(req, res, next))
+router.route('/create')
+  .post((req, res, next) => controller.createPost(req, res, next))
+router.route('/logout')
+  .get(authenticateToken,
+    (req, res, next) => controller.logout(req, res, next))
