@@ -28,8 +28,7 @@ export class UserController {
         const user = await User.findOne({ username: req.body.username })
 
         const payload = {
-          id: user.id.toString(),
-          username: req.body.username
+          id: user.id.toString()
         }
 
         // Generate a new JWT token with user data, using the JWT secret and setting it to expire in 1 hour
