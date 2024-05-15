@@ -84,7 +84,6 @@ export class PuzzleController {
     }
   }
 
-  // TODO: Hur hantera pussel som saknar bild?
   /**
    * Gets a specific puzzle by id.
    *
