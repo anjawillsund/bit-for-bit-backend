@@ -36,13 +36,6 @@ export class UserController {
         token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
         res.status(200).json(token)
       }
-      // Regenerates a new session.
-      req.session.regenerate(() => {
-        // Sets session username to the submitted username.
-        req.session.username = req.body.username
-        // Sets session token to the generated token.
-        req.session.token = token
-      })
       console.log('User logged in successfully.')
     } catch (error) {
       console.log('Error: ' + error.message)
