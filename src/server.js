@@ -99,11 +99,6 @@ try {
       return res.status(404).json({ message: err.message })
     }
 
-    // 405 Method Not Allowed.
-    if (err.status === 405) {
-      return res.status(405).json({ message: err.message })
-    }
-
     // 500 Internal Server Error (in production, all other errors send this response).
     if (req.app.get('env') !== 'development') {
       return res.status(500).json({ message: err.message })
