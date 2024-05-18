@@ -71,6 +71,8 @@ To test the API endpoints, you can use the provided Postman collection:
 The boiler plate code in this project is from the application "PixFlixr" that was developed by Anja Willsund during the course 1DV613 Software Development Project.  
 Contributions to the "Bit För Bit" project are welcome. If you have suggestions or improvements, please fork the repository and submit a pull request.
 
+The credit for the puzzle image used in the application goes to Mel Poole at [Unsplash](https://unsplash.com/photos/white-and-black-hearts-illustration-eo5Hrzyb4D0).
+
 ## License
 Distributed under the MIT License. See `LICENSE` for more information.
 
