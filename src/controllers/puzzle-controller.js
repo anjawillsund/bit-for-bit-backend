@@ -299,7 +299,7 @@ export class PuzzleController {
       error.status = 400
       next(error)
     } else {
-      console.log('Error: ' + error.message)
+      console.error('Error: ' + error.message)
       next(error)
     }
   }
