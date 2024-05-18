@@ -63,7 +63,7 @@ To test the API endpoints, you can use the provided Postman collection:
 ### Puzzle Management
 - POST /puzzles - Add a new puzzle to the collection.
 - GET /puzzles - Retrieve all puzzles.
-- GET /puzzles/:id - Gets a specific puzzle.
+- GET /puzzles/:id - Retrieve a specific puzzle.
 - PUT /puzzles/:id - Update a specific puzzle.
 - DELETE /puzzles/:id - Remove a puzzle from the collection.
 
