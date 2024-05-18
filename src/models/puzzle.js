@@ -208,30 +208,6 @@ const schema = new mongoose.Schema({
       message: props => 'Om pusslet är utlånat måste även namnet på personen som pusslet är utlånat till anges.'
     }
   },
-  // lentOutTo: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'User',
-  //   required: false,
-  //   validate: {
-  //     /**
-  //      * Validates that if the puzzle lent out, whom the puzzle is lent out to must also be submitted.
-  //      *
-  //      * @param {string} value - The submitted user id.
-  //      * @returns {boolean} True if the submitted user id is not '6617db0e18569854b2352a68' or if lentOutToString has been submitted, otherwise false.
-  //      */
-  //     validator: function (value) {
-  //       return !(value.toString() === '6617db0e18569854b2352a68' && !this.lentOutToString)
-  //     },
-  //     /**
-  //      * This message is shown when the validation fails,
-  //      * indicating that 'lentOutToString' must be provided if 'lentOutTo' is '6617db0e18569854b2352a68'.
-  //      *
-  //      * @param {object} props - The context properties object provided by Mongoose, which contains information about the failed validation.
-  //      * @returns {string} The custom error message for the validation failure.
-  //      */
-  //     message: props => 'If \'lentOutTo\' is \'other\', \'lentOutToString\' must also be provided.'
-  //   }
-  // },
   lentOutToString: {
     type: String,
     required: false,
@@ -264,8 +240,7 @@ const schema = new mongoose.Schema({
   }
 })
 
-// Makes the code more readable and doesn't expose that we are using
-// mongoose.
+// Makes the code more readable and doesn't expose that we are using mongoose.
 schema.virtual('id').get(function () {
   return this._id.toHexString()
 })
@@ -275,14 +250,6 @@ schema.pre('save', function () {
   if (this.missingPiecesNumber > 0) {
     this.complete = false
   }
-  // if (this.lentOutTo) {
-  //   this.isLentOut = true
-  //   this.lentOutToString = null
-  // }
-  // if (this.lentOutToString && !this.lentOutTo) {
-  //   this.lentOutTo = '6617db0e18569854b2352a68'
-  //   this.isLentOut = true
-  // }
   if (this.privateNote) {
     this.privateNote = JSON.stringify(encryptPrivateNote(this.privateNote))
   }
