@@ -27,6 +27,7 @@ export class UserController {
       if (await User.authenticate(req.body.username, req.body.password)) {
         const user = await User.findOne({ username: req.body.username })
 
+        // Payload to be stored in the JWT token
         const payload = {
           id: user.id.toString()
         }
@@ -35,9 +36,8 @@ export class UserController {
         token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
         res.status(200).json(token)
       }
-      console.log('User logged in successfully.')
     } catch (error) {
-      console.log('Error: ' + error.message)
+      console.error('Error: ' + error.message)
       error.status = 401
       next(error)
     }
@@ -52,6 +52,7 @@ export class UserController {
    */
   async createPost (req, res, next) {
     try {
+      // Checks if the password and repeated password match
       if (req.body.password !== req.body.repeatPassword) {
         throw new Error('Lösenorden stämmer inte överens. Vänligen försök igen.')
       }
@@ -62,7 +63,6 @@ export class UserController {
       })
 
       await user.save()
-      console.log('User account created successfully.')
       res.status(201).json({ message: 'Ditt konto har skapats! Logga in för att använda applikationen.' })
     } catch (error) {
       if (error.message.includes('E11000 duplicate key error collection')) {
@@ -74,7 +74,7 @@ export class UserController {
           error.message = 'Lösenordet måste innehålla mellan 10-2 000 tecken.'
         }
       }
-      console.log(error)
+      console.error('Error: ' + error.message)
       error.status = 400
       next(error)
     }
@@ -91,11 +91,10 @@ export class UserController {
     try {
     // Destroys the session when logging out.
       req.session.destroy(() => {
-        console.log('User logged out successfully.')
         res.status(200).json()
       })
     } catch (error) {
-      console.log('Error: ' + error.message)
+      console.error('Error: ' + error.message)
       error.message('Fel vid utloggning. Vänligen försök igen.')
       error.status = 400
       next(error)
