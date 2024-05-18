@@ -11,8 +11,6 @@ import sharp from 'sharp'
 import { Puzzle } from '../models/puzzle.js'
 import fs from 'fs'
 
-// import nullPuzzle from '../assets/images/null-puzzle.jpg'
-
 /**
  * Encapsulates a controller.
  */
@@ -66,7 +64,8 @@ export class PuzzleController {
    */
   async loadPuzzle (req, res, next, id) {
     try {
-      // This error is added to handle the case when the id is not a valid ObjectId, which must be a string consisting of exactly 24 hexadecimal characters.
+      // This error is added to handle the case when the id is not a valid ObjectId,
+      // which must be a string consisting of exactly 24 hexadecimal characters.
       if (!id.match(/^[0-9a-fA-F]{24}$/)) {
         next(createError(400, 'Invalid id'))
         return
@@ -95,7 +94,6 @@ export class PuzzleController {
     try {
       const puzzle = req.puzzle
       const responseData = await this.#transformPuzzleData(puzzle)
-      console.log(responseData)
       res.status(200).json(responseData)
     } catch (error) {
       next(error)
@@ -111,6 +109,7 @@ export class PuzzleController {
    */
   async getAllPuzzles (req, res, next) {
     try {
+      // Find all puzzles for the authenticated user and exclude the owner, createdAt, updatedAt and __v fields
       const puzzles = await Puzzle.find({ owner: req.user.id }, '_id -owner -createdAt -updatedAt -__v')
       if (!puzzles) {
         next(createError(404, 'No puzzles found'))
@@ -121,6 +120,7 @@ export class PuzzleController {
           return { ...puzzle.toObject() }
         }
         const imageBase64 = puzzle.image.toString('base64')
+        // Return the puzzle data and the image as a base64 string, prefixed with the data URL scheme
         return { ...puzzle.toObject(), imageUrl: `data:image/png;base64,${imageBase64}` }
       })
       res.status(200).json(updatedPuzzles)
@@ -138,6 +138,7 @@ export class PuzzleController {
    */
   async updatePuzzle (req, res, next) {
     try {
+      // Update the puzzle input
       const puzzleInput = await this.#updatePuzzleInput(req)
 
       const puzzle = req.puzzle
@@ -154,7 +155,6 @@ export class PuzzleController {
       puzzle.sharedNote = puzzleInput.sharedNote || ''
       puzzle.isPrivate = puzzleInput.isPrivate
       puzzle.isLentOut = puzzleInput.isLentOut
-      // puzzle.lentOutTo = puzzleInput.lentOutTo || puzzle.lentOutTo
       !puzzle.isLentOut ? puzzle.lentOutToString = null : puzzle.lentOutToString = puzzleInput.lentOutToString || puzzle.lentOutToString
       puzzle.image = puzzleInput.imageBinary || puzzle.image
 
@@ -176,7 +176,6 @@ export class PuzzleController {
     try {
       const puzzle = await Puzzle.deleteOne({ _id: req.puzzle.id.toString() })
       if (puzzle.deletedCount === 1) {
-        console.log('Puzzle was deleted successfully.')
         req.message = 'Puzzle was deleted successfully.'
       } else {
         throw new Error('An unknown error occured. Please try again.')
@@ -199,6 +198,7 @@ export class PuzzleController {
     if (puzzle.image !== null) {
       imageBase64 = puzzle.image.toString('base64')
     } else {
+      // If the image is null, use a placeholder image
       const nullImage = './src/assets/images/null-puzzle.png'
       imageBase64 = await this.#convertImageToBase64(nullImage)
     }
@@ -213,6 +213,7 @@ export class PuzzleController {
     }
     if (puzzle.lastPlayed) {
       const lastPlayed = new Date(puzzle.lastPlayed)
+      // Adjust the date format to YYYY-MM-DD
       responseData.lastPlayed = lastPlayed.toISOString().slice(0, 10)
     }
     return responseData
@@ -225,10 +226,16 @@ export class PuzzleController {
    * @returns {string} The decrypted private note.
    */
   #decryptPrivateNote (privateNote) {
+    // Parse the private note to get the initialization vector (iv) and encrypted data
     const { iv, encryptedData } = JSON.parse(privateNote)
+    // Create a cryptographic key from the SECRET_ENCRYPTION_KEY environment variable, decoding from base64
     const key = Buffer.from(process.env.SECRET_ENCRYPTION_KEY, 'base64')
+    // Initialize the decryption algorithm ('aes-256-cbc') with the key and the iv (initialization vector),
+    // converting the iv from hex to a buffer
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'))
+    // Use the decipher to decrypt the encrypted data part, converting from hex to utf-8 string
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
+    // Finalize the decryption process by adding any remaining decrypted data that was buffered
     decrypted += decipher.final('utf8')
     return decrypted
   }
@@ -240,12 +247,17 @@ export class PuzzleController {
    * @returns {string} The image as a base64 string.
    */
   async #convertImageToBase64 (filePath) {
+    // Return a new Promise to handle asynchronous file read operation.
     return new Promise((resolve, reject) => {
+      // Read the file asynchronously from the provided filePath.
       fs.readFile(filePath, (error, data) => {
+        // If there is an error reading the file, reject the Promise with the error.
         if (error) {
           reject(error)
         } else {
+          // Convert the file data from a Buffer to a base64 string.
           const base64String = Buffer.from(data).toString('base64')
+          // If conversion is successful, resolve the Promise with the base64 string.
           resolve(base64String)
         }
       })
@@ -259,7 +271,6 @@ export class PuzzleController {
    * @param {Function} next - Express next middleware function.
    */
   #handleAddOrUpdateError (error, next) {
-    console.log('Error: ' + error.message)
     if (error.message.includes('Puzzle validation failed') ||
      error.message.includes('inte ett giltigt nummer') ||
      error.message.includes('Namnet på den som har lånat pusslet måste anges') ||
@@ -268,7 +279,9 @@ export class PuzzleController {
      error.message.includes('Datumet är ogiltigt.')) {
       const errors = []
       if (error.message.includes('Puzzle validation failed') && (!error.message.includes('Invalid Date'))) {
+        // Loop through the error object and push the error messages to the errors array
         for (const key in error.errors) {
+          // Check if the error object has the key
           if (Object.prototype.hasOwnProperty.call(error.errors, key)) {
             errors.push(error.errors[key].message)
           }
@@ -379,13 +392,14 @@ export class PuzzleController {
   async #convertImageToPng (req) {
     let imageBinary = null
     if (req.file) {
+      // Convert the file buffer to a PNG format using the Sharp library
+      // The image is resized to a width of 500 pixels. The height is auto-scaled to maintain aspect ratio
       const pngBuffer = sharp(req.file.buffer)
         .resize({ width: 500 })
         .png()
-        .toBuffer()
+        .toBuffer() // Convert the processed image to a buffer
       imageBinary = pngBuffer
     }
-    // console.log(await imageBinary)
     return imageBinary
   }
 }
