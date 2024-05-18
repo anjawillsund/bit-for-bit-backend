@@ -23,15 +23,20 @@ try {
 
   app.use(logger('dev'))
 
-  // TODO: Ska detta finnas kvar?
-  app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+  // Middleware to parse URL-encoded bodies. This is used for form submissions.
+  app.use(express.urlencoded({
+    extended: true, // Enables parsing of nested objects, meaning that it can handle deeply nested objects.
+    limit: '10mb' // Sets the maximum allowed size of the URL-encoded payload to 10MB.
+  }))
 
   app.use(express.static(join(directoryFullName, '..', 'public')))
 
   app.use(helmet())
 
-  // TODO: Ska detta finnas kvar med React? Fanns inte med i PixFlixr
-  app.use(express.json({ limit: '10mb' }))
+  // Middleware to parse JSON bodies. This allows the server to accept JSON in request bodies.
+  app.use(express.json({
+    limit: '10mb' // Sets the maximum allowed size of the JSON payload to 10MB.
+  }))
 
   // Add headers to allow cross origin requests.
   app.use((req, res, next) => {
@@ -53,7 +58,7 @@ try {
     next()
   })
 
-  // Setup and use session middleware (https://github.com/expressjs/session).
+  // Setup and use session middleware.
   const sessionOptions = {
     name: process.env.SESSION_NAME,
     secret: process.env.SESSION_SECRET,
