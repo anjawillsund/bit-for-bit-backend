@@ -13,7 +13,6 @@ export const authenticateToken = (req, res, next) => {
 
   // Check if the token is missing
   if (!token) {
-    console.log('No token provided.')
     res.status(401).json({ error: 'No token provided.' })
     return
   }
@@ -22,14 +21,13 @@ export const authenticateToken = (req, res, next) => {
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     // Check if there is an error during token verification
     if (err) {
-      console.log(err)
+      console.error(err)
       // Return a 401 error if the token is invalid
       res.status(401).json({ error: 'Invalid token.' })
       return
     }
     // Attach the decoded user information to the request object for further processing
     req.user = decoded
-    console.log('Token authenticated')
     // Proceed to the next middleware or route handler if the token is valid
     next()
   })
