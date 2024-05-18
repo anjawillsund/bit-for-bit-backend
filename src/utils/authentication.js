@@ -18,7 +18,6 @@ export const authenticateToken = (req, res, next) => {
     return
   }
 
-  // TODO: Är detta rätt hantering av JWT?
   // Verify the token using the secret key
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     // Check if there is an error during token verification
