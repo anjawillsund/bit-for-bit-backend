@@ -70,3 +70,8 @@ To test the API endpoints, you can use the provided Postman collection:
 ## Contributing
 The boiler plate code in this project is from the application "PixFlixr" that was developed by Anja Willsund during the course 1DV613 Software Development Project.  
 Contributions to the "Bit För Bit" project are welcome. If you have suggestions or improvements, please fork the repository and submit a pull request.
+
+## License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+Please adjust the specific details according to your project's actual setup. If you have specific sections or details you'd like to add or modify, let me know! If you want more information about this project and how it was developed, please visit the project's [Wiki](https://github.com/aw22hs/bit-for-bit/wiki).
